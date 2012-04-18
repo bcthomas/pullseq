@@ -13,16 +13,16 @@ extern char const *progname;
 
 void pull_from_list(char *input_file, char *names_file, int min, int max) {
   FILE *fp;
-  int i,count,l,capacity=80;
+  int i,count=0,l,capacity=80;
   node *n;
   list_t *list;
   char *fasta_name;
   char *line;
   kseq_t *seq;
 
-  fp = fopen(input_file,"r");
+  fp = fopen(names_file,"r");
   if (!fp) {
-    fprintf(stderr,"%s - failed to open file %s\n",progname,input_file);
+    fprintf(stderr,"%s - failed to open file %s\n",progname,names_file);
     exit(EXIT_FAILURE);
   }
 
@@ -54,35 +54,41 @@ void pull_from_list(char *input_file, char *names_file, int min, int max) {
   fprintf(stderr,"done reading from %s\n",progname);
 
   /* open fasta file */
-  fp = gzopen(names_file,"r");
+  fp = gzopen(input_file,"r");
   if (!fp) {
-    fprintf(stderr,"%s - Couldn't open fasta file %s\n",progname,names_file);
+    fprintf(stderr,"%s - Couldn't open fasta file %s\n",progname,input_file);
     exit(EXIT_FAILURE);
   }
 
   seq = kseq_init(fp);
   /* search through list and see if this header matches */
   while((l = kseq_read(seq)) >= 0) {
-    if (search_list(list,seq->name.s)) {
-      fprintf(stdout,">%s %s\n%s\n",seq->name.s,seq->comment.s,seq->seq.s);
+    if (search_list(list,seq->name.s)) {            /* found name in list */
+      if (min > 0 && max > 0) { /* got a min and max */
+        if (seq->seq.l >= min && seq->seq.l <= max) {
+          count++;
+          printf(">%s %s\n%s\n",seq->name.s,seq->comment.s,seq->seq.s);
+        }
+      } else if (min > 0 || max > 0) { /* either  min or max is 0 */
+        if (min > 0 && seq->seq.l >= min) {
+          count++;
+          printf(">%s %s\n%s\n",seq->name.s,seq->comment.s,seq->seq.s);
+        } else if (max > 0 && seq->seq.l <= max) {
+          count++;
+          printf(">%s %s\n%s\n",seq->name.s,seq->comment.s,seq->seq.s);
+        }
+      } else {
+        count++;
+        printf(">%s %s\n%s\n",seq->name.s,seq->comment.s,seq->seq.s);
+      }
     }
   }
   kseq_destroy(seq);
-  gzclose(fp);
+  gzclose(fp); /* done reading file */
 
-  /* process list */
-  n = list->head;
-  count = 0;
-  fprintf(stderr,"address: word\n");
-  while(n != NULL) {
-    count++;
-    fprintf(stderr,"%p: %s\n",(void *)n,n->word);
-    n = n->next;
-  }
-  fprintf(stderr,"\n\ncount = %i\n",count);
+  delete_list(list,list->head); /* free the list nodes */
+  free(list); /* free the list structure */
 
-  delete_list(list,list->head);
-  free(list); /* drop the list structure */
-
+  fprintf(stderr,"Output contained %i entries\n",count);
   exit(EXIT_SUCCESS);
 }
