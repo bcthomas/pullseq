@@ -1,0 +1,17 @@
+A) size filters
+Open fasta/fastq file
+Foreach fasta/fastq in file
+ o if sequence length passes the size filters, print
+
+B) contig list filters
+Open contig list file
+ o read in first word on each line
+ o store in a linked list
+
+Open fasta/fastq file
+Foreach fasta/fastq in file
+ o if sequence length passes the size filters, print
+
+main()
+
+
