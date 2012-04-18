@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
   extern char *optarg; /* external from getopt */
 
   progname = argv[0];
-  if (argc < 5) {
+  if (argc < 4) {
     show_usage(EXIT_FAILURE);
   }
 
@@ -162,10 +162,8 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  if (names) {
-    fprintf(stderr,"about to call pull_from_list() with %s, %s, %i, %i\n",in,names,min,max);
-    pull_from_list(in,names,min,max);
-  }
+  fprintf(stderr,"about to call pull_from_list() with %s, %s, %i, %i\n",in,names,min,max);
+  pull_from_list(in,names,min,max);
 
   free(in);
   if (names) {
