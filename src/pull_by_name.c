@@ -4,14 +4,19 @@
 #include <zlib.h>
 #include <errno.h>
 
-#include "pull_from_list.h"
+#include "pull_by_name.h"
 #include "linked_list.h"
 #include "file_read.h"
 #include "global.h"
+#include "kseq.h"
+
+__KS_GETC(gzread, BUFFER_SIZE)
+__KS_GETUNTIL(gzread, BUFFER_SIZE)
+__KSEQ_READ
 
 extern char const *progname;
 
-void pull_from_list(char *input_file, char *names_file, int min, int max) {
+int pull_by_name(char *input_file, char *names_file, int min, int max) {
   FILE *fp;
   int i,count=0,l,capacity=80;
   node *n;
@@ -90,5 +95,5 @@ void pull_from_list(char *input_file, char *names_file, int min, int max) {
   free(list); /* free the list structure */
 
   fprintf(stderr,"Output contained %i entries\n",count);
-  exit(EXIT_SUCCESS);
+  return count;
 }

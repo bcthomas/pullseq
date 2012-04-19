@@ -5,6 +5,7 @@
 #include <limits.h>
 
 #include "file_read.h"
+#include "global.h"
 
 char *parse_name(char *line)
 {

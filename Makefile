@@ -14,18 +14,21 @@ default: build
 
 #file_read.o: $(SDIR)/file_read.c $(SDIR)/file_read.h
 file_read.o: $(SDIR)/file_read.c
-	$(CC) $(CFLAGS) $(OPT) -c $(SDIR)/$*.c # -o $(SDIR)/$*.o
+	$(CC) $(CFLAGS) $(OPT) -c $(SDIR)/$*.c
 
 #linked_list.o: $(SDIR)/linked_list.c $(SDIR)/linked_list.h
 linked_list.o: $(SDIR)/linked_list.c
-	$(CC) $(CFLAGS) $(OPT) -c $(SDIR)/$*.c # -o $(SDIR)/$*.o
+	$(CC) $(CFLAGS) $(OPT) -c $(SDIR)/$*.c
 
 #pull_from_list.o: $(SDIR)/pull_from_list.c $(SDIR)/pull_from_list.h $(SDIR)/kseq.h
-pull_from_list.o: $(SDIR)/pull_from_list.c
-	$(CC) $(CFLAGS) $(OPT) -c $(SDIR)/$*.c # -o $(SDIR)/$*.o
+pull_by_name.o: $(SDIR)/pull_by_name.c
+	$(CC) $(CFLAGS) $(OPT) -c $(SDIR)/$*.c
+
+pull_by_size.o: $(SDIR)/pull_by_size.c
+	$(CC) $(CFLAGS) $(OPT) -c $(SDIR)/$*.c
 
 pullseq.o: $(SDIR)/pullseq.c
-	$(CC) $(CFLAGS) $(OPT) -c $(SDIR)/$*.c # -o $(SDIR)/$*.o
+	$(CC) $(CFLAGS) $(OPT) -c $(SDIR)/$*.c
 
 clean:
 	rm -rf *.o $(SDIR)/*.o $(SDIR)/*.gch ./pullseq
@@ -36,7 +39,7 @@ distclean: clean
 dist:
 	tar -zcf $(ARCHIVE).tar.gz *.ch Makefile
 
-build: file_read.o linked_list.o pull_from_list.o pullseq.o
+build: file_read.o linked_list.o pull_by_name.o pull_by_size.o pullseq.o
 	$(CC) $(CFLAGS) $(LDFLAGS) $(OPT) $? -o pullseq
 
 debug:

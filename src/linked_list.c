@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "linked_list.h"
+#include "global.h"
 
 /* initialize the list */
 void initialize_list(list_t *list)

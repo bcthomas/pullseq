@@ -7,7 +7,8 @@
 
 #include "global.h"
 #include "pullseq.h"
-#include "pull_from_list.h"
+#include "pull_by_name.h"
+#include "pull_by_size.h"
 
 
 void show_usage(int status) {
@@ -35,6 +36,7 @@ int main(int argc, char *argv[]) {
   char *in = NULL,*names = NULL;
   int min = -1, max = -1;
   int exclude = 0;
+  int count = 0;
 
   extern char *optarg; /* external from getopt */
 
@@ -162,12 +164,18 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  fprintf(stderr,"about to call pull_from_list() with %s, %s, %i, %i\n",in,names,min,max);
-  pull_from_list(in,names,min,max);
+  if (names) {
+    fprintf(stderr,"about to call pull_by_name() with %s, %s, %i, %i\n",in,names,min,max);
+    count = pull_by_name(in,names,min,max);
+  } else {
+    fprintf(stderr,"about to call pull_by_size() with %s, %i, %i\n",in,min,max);
+    count = pull_by_size(in,min,max);
+  }
 
   free(in);
   if (names) {
     free(names);
   }
+  fprintf(stderr,"Pulled %i entries\n",count);
   return EXIT_SUCCESS;
 }
