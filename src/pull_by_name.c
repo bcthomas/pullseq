@@ -5,9 +5,10 @@
 #include <errno.h>
 
 #include "pull_by_name.h"
-#include "linked_list.h"
+#include "bst.h"
 #include "file_read.h"
 #include "global.h"
+#include "output.h"
 #include "kseq.h"
 
 __KS_GETC(gzread, BUFFER_SIZE)
@@ -15,12 +16,13 @@ __KS_GETUNTIL(gzread, BUFFER_SIZE)
 __KSEQ_READ
 
 extern char const *progname;
+extern int verbose_flag;
 
-int pull_by_name(char *input_file, char *names_file, int min, int max) {
+int pull_by_name(char *input_file, char *names_file, int min, int max, int length) {
   FILE *fp;
   int i,count=0,l,capacity=80;
-  node *n;
-  list_t *list;
+  node_t *n;
+  tree_t *tree = (tree_t*)malloc(sizeof(tree_t*));
   char *fasta_name;
   char *line;
   kseq_t *seq;
@@ -31,11 +33,8 @@ int pull_by_name(char *input_file, char *names_file, int min, int max) {
     exit(EXIT_FAILURE);
   }
 
-  list = (list_t *) malloc(sizeof(list_t)); /* create list for fasta names */
-  initialize_list(list);                    /* and initialize to NULL      */
-  n = (node *) NULL;
-
-  fprintf(stderr,"reading 1st name from file\n");
+  tree->root = NULL;                    /* initialize tree to NULL      */
+  n = (node_t *) NULL;
 
   /* get some space for the line */
   line = malloc(sizeof(char) * capacity); /* get memory allocated */
@@ -47,16 +46,16 @@ int pull_by_name(char *input_file, char *names_file, int min, int max) {
   while((i = getl(&line,fp)) != -1) {
     fasta_name = parse_name(line);
     if (fasta_name) {
-      fprintf(stderr,".");
-      n = initnode(fasta_name);             /* create a new node with fasta_name */
-      add_to_list(list,n);                  /* add it to the list */
+       insertnode(tree,fasta_name);             /* create a new node with fasta_name */
     }
   }
 
   free(line); /* free up line */
   fclose(fp); /* close file */
-  fprintf(stderr,"\n");
-  fprintf(stderr,"done reading from %s\n",progname);
+  if (verbose_flag) {
+	  fprintf(stderr,"\n");
+	  fprintf(stderr,"done reading from %s\n",progname);
+  }
 
   /* open fasta file */
   fp = gzopen(input_file,"r");
@@ -68,32 +67,32 @@ int pull_by_name(char *input_file, char *names_file, int min, int max) {
   seq = kseq_init(fp);
   /* search through list and see if this header matches */
   while((l = kseq_read(seq)) >= 0) {
-    if (search_list(list,seq->name.s)) {            /* found name in list */
+    if (searchtree(tree,seq->name.s)) {            /* found name in list */
       if (min > 0 && max > 0) { /* got a min and max */
         if (seq->seq.l >= min && seq->seq.l <= max) {
-          count++;
-          printf(">%s %s\n%s\n",seq->name.s,seq->comment.s,seq->seq.s);
+			count++;
+			print_seq(seq,length);
         }
       } else if (min > 0 || max > 0) { /* either  min or max is 0 */
         if (min > 0 && seq->seq.l >= min) {
-          count++;
-          printf(">%s %s\n%s\n",seq->name.s,seq->comment.s,seq->seq.s);
+			count++;
+			print_seq(seq,length);
         } else if (max > 0 && seq->seq.l <= max) {
-          count++;
-          printf(">%s %s\n%s\n",seq->name.s,seq->comment.s,seq->seq.s);
+			count++;
+			print_seq(seq,length);
         }
       } else {
-        count++;
-        printf(">%s %s\n%s\n",seq->name.s,seq->comment.s,seq->seq.s);
+		count++;
+		print_seq(seq,length);
       }
     }
   }
   kseq_destroy(seq);
   gzclose(fp); /* done reading file */
 
-  delete_list(list,list->head); /* free the list nodes */
-  free(list); /* free the list structure */
+  deletetree(tree); /* free the list nodes */
 
-  fprintf(stderr,"Output contained %i entries\n",count);
+  if (verbose_flag)
+	  fprintf(stderr,"Output contained %i entries\n",count);
   return count;
 }

@@ -18,7 +18,6 @@ __KS_BASIC(gzFile, BUFFER_SIZE)
 __KSEQ_TYPE(gzFile)
 __KSEQ_BASIC(gzFile)
 
-static int verbose_flag;
 char const *progname;
-
+int verbose_flag;
 #endif

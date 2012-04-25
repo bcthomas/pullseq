@@ -10,7 +10,6 @@
 #include "pull_by_name.h"
 #include "pull_by_size.h"
 
-
 void show_usage(int status) {
   fprintf(stderr, "\nUsage:\n"
                   "%s -i <input fasta/fastq file> -n <header names to select>\n\n"
@@ -23,10 +22,11 @@ void show_usage(int status) {
 
   fprintf(stderr, "    -m, --min,       Minimum sequence length\n"
                   "    -a, --max,       Maximum sequence length\n"
+                  "    -l, --length,    Sequence characters per line (default 50)\n"
                   "    -e, --excluded,  Exclude the header id names in the list (-n)\n");
   fprintf(stderr, "    -h, --help,      Display this help and exit\n"
                   "    --verbose,       Print extra details during the run\n"
-                  "    --version,       Output version information and exit\n\n");  
+                  "    --version,       Output version information and exit\n\n");
 
   exit(status);
 }
@@ -37,8 +37,10 @@ int main(int argc, char *argv[]) {
   int min = -1, max = -1;
   int exclude = 0;
   int count = 0;
+  int length = 50;
 
   extern char *optarg; /* external from getopt */
+  static int verbose_flag = 0; /* global for other code */
 
   progname = argv[0];
   if (argc < 4) {
@@ -59,6 +61,7 @@ int main(int argc, char *argv[]) {
           {"names",   required_argument, 0, 'n'},
           {"min",     required_argument, 0, 'm'},
           {"max",     required_argument, 0, 'a'},
+          {"length",  required_argument, 0, 'l'},
           {"exclude", no_argument, 0, 'e'},
           {"version", no_argument, 0, 'V'},
           {"help",    no_argument, 0, 'h'},
@@ -68,7 +71,7 @@ int main(int argc, char *argv[]) {
     /* getopt_long stores the option index here. */
     int option_index = 0;
  
-    c = getopt_long (argc, argv, "Vh?ei:n:m:a:", long_options, &option_index);
+    c = getopt_long (argc, argv, "Vh?ei:n:m:a:l:", long_options, &option_index);
  
     /* Detect the end of the options. */
     if (c == -1)
@@ -112,6 +115,11 @@ int main(int argc, char *argv[]) {
         exclude = 1;
         break;
 
+      case 'l':
+        DEBUGP("Sequence characters per line set to %i\n",length);
+        length = atoi(optarg);
+        break;
+
       case 'V':
         /* version */
         printf("Version is %s\n","version");
@@ -138,10 +146,11 @@ int main(int argc, char *argv[]) {
  
    /* Print any remaining command line arguments (not options). */
   if (optind < argc) {
-    printf ("non-option ARGV-elements: ");
-    while (optind < argc)
-      printf ("%s ", argv[optind++]);
-    putchar ('\n');
+	  if (verbose_flag) 
+		printf ("non-option ARGV-elements: ");
+	while (optind < argc)
+	printf ("%s ", argv[optind++]);
+	putchar ('\n');
   }
 
   /* check validity of given argument set */
@@ -165,17 +174,19 @@ int main(int argc, char *argv[]) {
   }
 
   if (names) {
-    fprintf(stderr,"about to call pull_by_name() with %s, %s, %i, %i\n",in,names,min,max);
-    count = pull_by_name(in,names,min,max);
+    count = pull_by_name(in,names,min,max,length);
   } else {
-    fprintf(stderr,"about to call pull_by_size() with %s, %i, %i\n",in,min,max);
-    count = pull_by_size(in,min,max);
+    count = pull_by_size(in,min,max,length);
   }
 
   free(in);
   if (names) {
     free(names);
   }
-  fprintf(stderr,"Pulled %i entries\n",count);
+  if (verbose_flag)
+	  fprintf(stderr,"Pulled %i entries\n",count);
+  fclose(stderr);
+  fclose(stdout);
+  fclose(stdin);
   return EXIT_SUCCESS;
 }
