@@ -5,11 +5,12 @@
 #include <errno.h>
 
 #include "pull_by_name.h"
-#include "bst.h"
+#include "hash.h"
 #include "file_read.h"
 #include "global.h"
 #include "output.h"
 #include "kseq.h"
+#include "uthash.h"
 
 __KS_GETC(gzread, BUFFER_SIZE)
 __KS_GETUNTIL(gzread, BUFFER_SIZE)
@@ -21,8 +22,6 @@ extern int verbose_flag;
 int pull_by_name(char *input_file, char *names_file, int min, int max, int length) {
   FILE *fp;
   int i,count=0,l,capacity=80;
-  node_t *n;
-  tree_t *tree = (tree_t*)malloc(sizeof(tree_t*));
   char *fasta_name;
   char *line;
   kseq_t *seq;
@@ -32,9 +31,6 @@ int pull_by_name(char *input_file, char *names_file, int min, int max, int lengt
     fprintf(stderr,"%s - failed to open file %s\n",progname,names_file);
     exit(EXIT_FAILURE);
   }
-
-  tree->root = NULL;                    /* initialize tree to NULL      */
-  n = (node_t *) NULL;
 
   /* get some space for the line */
   line = malloc(sizeof(char) * capacity); /* get memory allocated */
@@ -46,7 +42,7 @@ int pull_by_name(char *input_file, char *names_file, int min, int max, int lengt
   while((i = getl(&line,fp)) != -1) {
     fasta_name = parse_name(line);
     if (fasta_name) {
-       insertnode(tree,fasta_name);             /* create a new node with fasta_name */
+		add_name(fasta_name);             /* add fasta_name to hash */
     }
   }
 
@@ -64,10 +60,12 @@ int pull_by_name(char *input_file, char *names_file, int min, int max, int lengt
     exit(EXIT_FAILURE);
   }
 
+  /*print_hash();*/
+
   seq = kseq_init(fp);
   /* search through list and see if this header matches */
   while((l = kseq_read(seq)) >= 0) {
-    if (searchtree(tree,seq->name.s)) {            /* found name in list */
+    if (find_name(seq->name.s)) {            /* found name in list */
       if (min > 0 && max > 0) { /* got a min and max */
         if (seq->seq.l >= min && seq->seq.l <= max) {
 			count++;
@@ -90,7 +88,7 @@ int pull_by_name(char *input_file, char *names_file, int min, int max, int lengt
   kseq_destroy(seq);
   gzclose(fp); /* done reading file */
 
-  deletetree(tree); /* free the list nodes */
+  delete_hash(); /* free the list nodes */
 
   if (verbose_flag)
 	  fprintf(stderr,"Output contained %i entries\n",count);

@@ -10,6 +10,7 @@
 #endif
 
 #include "kseq.h"
+#include "uthash.h"
 #include "zlib.h"
 #define BUFFER_SIZE 4096
 
@@ -20,4 +21,5 @@ __KSEQ_BASIC(gzFile)
 
 char const *progname;
 int verbose_flag;
+
 #endif

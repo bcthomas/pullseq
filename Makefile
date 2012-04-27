@@ -15,7 +15,7 @@ default: build
 file_read.o: $(SDIR)/file_read.c $(SDIR)/file_read.h
 	$(CC) $(CFLAGS) $(OPT) -c $(SDIR)/$*.c
 
-bst.o: $(SDIR)/bst.c $(SDIR)/bst.h
+hash.o: $(SDIR)/hash.c $(SDIR)/hash.h
 	$(CC) $(CFLAGS) $(OPT) -c $(SDIR)/$*.c
 
 output.o: $(SDIR)/output.c $(SDIR)/output.h
@@ -39,7 +39,7 @@ distclean: clean
 dist:
 	tar -zcf $(ARCHIVE).tar.gz *.ch Makefile
 
-build: file_read.o bst.o output.o pull_by_name.o pull_by_size.o pullseq.o
+build: file_read.o hash.o output.o pull_by_name.o pull_by_size.o pullseq.o
 	$(CC) $(CFLAGS) $(LDFLAGS) $(OPT) $? -o pullseq
 
 debug:
