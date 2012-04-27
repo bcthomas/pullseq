@@ -2,3 +2,10 @@
 *.o
 *.gch
 pullseq
+src/test_hash.c
+test/t100000.fq
+test/t100000.txt
+test/t1000000.fq
+test/t1000000.txt
+test/t10000000.fq
+test/t10000000.txt
