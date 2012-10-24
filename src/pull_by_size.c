@@ -16,9 +16,10 @@ __KSEQ_READ
 
 extern char const *progname;
 
-int pull_by_size(char *input_file, int min, int max,int length) {
+int pull_by_size(char *input_file, int min, int max,int length, int convert) {
   FILE *fp;
   int count=0,l;
+  int is_fasta = 0; /* assume this is fastq */
   kseq_t *seq;
 
   /* open fasta file */
@@ -31,22 +32,36 @@ int pull_by_size(char *input_file, int min, int max,int length) {
   seq = kseq_init(fp);
   /* search through list and see if this header matches */
   while((l = kseq_read(seq)) >= 0) {
+	if (seq->qual.s == NULL)
+		is_fasta = 1;
     if (min > 0 && max > 0) { /* got a min and max */
       if (l >= min && l <= max) {
         count++;
-		print_seq(seq,length);
+		if (convert)
+			is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
+		else
+			is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
       }
     } else if (min > 0 || max > 0) { /* either  min or max is 0 */
       if (min > 0 && l >= min) {
         count++;
-		print_seq(seq,length);
+		if (convert)
+			is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
+		else
+			is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
       } else if (max > 0 && l <= max) {
         count++;
-		print_seq(seq,length);
+		if (convert)
+			is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
+		else
+			is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
       }
     } else {
 		count++;
-		print_seq(seq,length);
+		if (convert)
+			is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
+		else
+			is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
     }
   }
   kseq_destroy(seq);

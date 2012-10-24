@@ -18,9 +18,10 @@ __KSEQ_READ
 extern char const *progname;
 extern int verbose_flag;
 
-int pull_by_name(char *input_file, char *names_file, int min, int max, int length) {
+int pull_by_name(char *input_file, char *names_file, int min, int max, int length, int exclude, int convert) {
   FILE *fp;
   int i,count=0,l,capacity=80;
+  int is_fasta = 0; /* assume this is fastq */
   node_t *n;
   tree_t *tree = (tree_t*)malloc(sizeof(tree_t*));
   char *fasta_name;
@@ -67,26 +68,78 @@ int pull_by_name(char *input_file, char *names_file, int min, int max, int lengt
   seq = kseq_init(fp);
   /* search through list and see if this header matches */
   while((l = kseq_read(seq)) >= 0) {
-    if (searchtree(tree,seq->name.s)) {            /* found name in list */
-      if (min > 0 && max > 0) { /* got a min and max */
-        if (seq->seq.l >= min && seq->seq.l <= max) {
-			count++;
-			print_seq(seq,length);
-        }
-      } else if (min > 0 || max > 0) { /* either  min or max is 0 */
-        if (min > 0 && seq->seq.l >= min) {
-			count++;
-			print_seq(seq,length);
-        } else if (max > 0 && seq->seq.l <= max) {
-			count++;
-			print_seq(seq,length);
-        }
-      } else {
-		count++;
-		print_seq(seq,length);
+	  if (seq->qual.s == NULL)
+		  is_fasta = 1;
+	  if (exclude == 0) {
+		  if (searchtree(tree,seq->name.s)) {            /* found name in list */
+			  if (min > 0 && max > 0) { /* got a min and max */
+				if (seq->seq.l >= min && seq->seq.l <= max) {
+					count++;
+					if (convert)
+						is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
+					else 
+						is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
+				}
+			  } else if (min > 0 || max > 0) { /* either  min or max is 0 */
+				if (min > 0 && seq->seq.l >= min) {
+					count++;
+					if (convert)
+						is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
+					else 
+						is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
+				} else if (max > 0 && seq->seq.l <= max) {
+					count++;
+					if (convert)
+						is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
+					else 
+						is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
+				}
+			  } else {
+				count++;
+				if (convert)
+					is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
+				else 
+					is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
+			  }
+		  }
+	  } else {
+		  if (searchtree(tree,seq->name.s)) {            /* found name in list so exclude it */
+			  if (verbose_flag) 
+				  fprintf(stderr,"Excluding %s\n",seq->name.s);
+
+		  } else {
+			  if (min > 0 && max > 0) { /* got a min and max */
+				if (seq->seq.l >= min && seq->seq.l <= max) {
+					count++;
+					if (convert)
+						is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
+					else 
+						is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
+				}
+			  } else if (min > 0 || max > 0) { /* either  min or max is 0 */
+				if (min > 0 && seq->seq.l >= min) {
+					count++;
+					if (convert)
+						is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
+					else 
+						is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
+				} else if (max > 0 && seq->seq.l <= max) {
+					count++;
+					if (convert)
+						is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
+					else 
+						is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
+				}
+			  } else {
+				count++;
+				if (convert)
+					is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
+				else 
+					is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
+			  }
+		  }
       }
-    }
-  }
+  } /* end while loop */
   kseq_destroy(seq);
   gzclose(fp); /* done reading file */
 

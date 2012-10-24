@@ -19,5 +19,6 @@ __KSEQ_TYPE(gzFile)
 __KSEQ_BASIC(gzFile)
 
 char const *progname;
+int QUALITY_SCORE;
 int verbose_flag;
 #endif

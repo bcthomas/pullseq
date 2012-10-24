@@ -1,6 +1,7 @@
 PROGRAM_NAME = main
-VERSION = 0.1
+VERSION = 0.2
 CC = gcc
+#CFLAGS = -g -Wall -pedantic -DVERSION=$(VERSION) -DDEBUG
 CFLAGS = -g -Wall -pedantic -DVERSION=$(VERSION)
 DEBUG = -g
 OPT = -O3
