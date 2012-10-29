@@ -54,3 +54,12 @@ void delete_hash()
 		free(current_name);
 	}
 }
+
+int hash_key_count(void)
+{
+	lookup_t *s;
+	int count = 0;
+	for(s=lookup;s!=NULL;s=s->hh.next)
+		count++;
+	return(count);
+}

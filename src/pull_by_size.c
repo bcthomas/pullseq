@@ -15,42 +15,70 @@ __KS_GETUNTIL(gzread, BUFFER_SIZE)
 __KSEQ_READ
 
 extern char const *progname;
+extern int verbose_flag;
 
-int pull_by_size(char *input_file, int min, int max,int length) {
-  FILE *fp;
-  int count=0,l;
-  kseq_t *seq;
+int pull_by_size(char *input_file, int min, int max,int length, int convert) {
+	FILE *fp;
+	int count=0,l;
+	int is_fasta = 0; /* assume fastq */
+	kseq_t *seq;
 
-  /* open fasta file */
-  fp = gzopen(input_file,"r");
-  if (!fp) {
-    fprintf(stderr,"%s - Couldn't open fasta file %s\n",progname,input_file);
-    exit(EXIT_FAILURE);
-  }
+	/* open fasta file */
+	fp = gzopen(input_file,"r");
+	if (!fp) {
+		fprintf(stderr,"%s - Couldn't open fasta file %s\n",progname,input_file);
+		exit(EXIT_FAILURE);
+	}
 
-  seq = kseq_init(fp);
-  /* search through list and see if this header matches */
-  while((l = kseq_read(seq)) >= 0) {
-    if (min > 0 && max > 0) { /* got a min and max */
-      if (l >= min && l <= max) {
-        count++;
-		print_seq(seq,length);
-      }
-    } else if (min > 0 || max > 0) { /* either  min or max is 0 */
-      if (min > 0 && l >= min) {
-        count++;
-		print_seq(seq,length);
-      } else if (max > 0 && l <= max) {
-        count++;
-		print_seq(seq,length);
-      }
-    } else {
-		count++;
-		print_seq(seq,length);
+	seq = kseq_init(fp);
+
+	/* determine file type */
+	l = kseq_read(seq);
+	if (seq->qual.s == NULL)
+		is_fasta = 1;
+	kseq_rewind(seq);
+
+    if (verbose_flag) {
+        if (is_fasta)
+            fprintf(stderr, "Input is FASTA format\n");
+        else
+            fprintf(stderr, "Input is FASTQ format\n");
     }
-  }
-  kseq_destroy(seq);
-  gzclose(fp); /* done reading file */
 
-  return count;
+	/* search through list and see if this header matches */
+	while((l = kseq_read(seq)) >= 0) {
+		if (min > 0 && max > 0) { /* got a min and max */
+			if (l >= min && l <= max) {
+				count++;
+				if (convert)
+					is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
+				else
+					is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
+			}
+		} else if (min > 0 || max > 0) { /* either  min or max is 0 */
+			if (min > 0 && l >= min) {
+				count++;
+				if (convert)
+					is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
+				else
+					is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
+			} else if (max > 0 && l <= max) {
+				count++;
+				if (convert)
+					is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
+				else
+					is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
+			}
+		} else {
+			count++;
+			if (convert)
+				is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
+			else
+				is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
+		}
+	}
+	kseq_destroy(seq);
+	gzclose(fp); /* done reading file */
+
+	return count;
 }

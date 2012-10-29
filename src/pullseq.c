@@ -10,7 +10,13 @@
 #include "pull_by_name.h"
 #include "pull_by_size.h"
 
+extern int QUALITY_SCORE;
+extern int verbose_flag;
+
 void show_usage(int status) {
+  fprintf(stderr, "pullseq - a bioinformatics tool for manipulating fasta and fastq files\n");
+  fprintf(stderr, "\n(Written by bct - 2012)     ");
+  fprintf(stderr, "search method: %s",PULLSEQ_SORTMETHOD);
   fprintf(stderr, "\nUsage:\n"
                   "%s -i <input fasta/fastq file> -n <header names to select>\n\n"
                   "%s -i <input fasta/fastq file> -m <minimum sequence length>\n\n"
@@ -22,10 +28,12 @@ void show_usage(int status) {
 
   fprintf(stderr, "    -m, --min,       Minimum sequence length\n"
                   "    -a, --max,       Maximum sequence length\n"
-                  "    -l, --length,    Sequence characters per line (default 50)\n"
+                  "    -l, --length,    Sequence characters per line (default 50)\n");
+  fprintf(stderr, "    -c, --convert,   Convert input to fastq/fasta (e.g. if input is fastq, output will be fasta)\n"
+  				  "    -q, --quality,   ASCII code to use for fasta->fastq quality conversions\n"
                   "    -e, --excluded,  Exclude the header id names in the list (-n)\n");
   fprintf(stderr, "    -h, --help,      Display this help and exit\n"
-                  "    --verbose,       Print extra details during the run\n"
+                  "    -v, --verbose,   Print extra details during the run\n"
                   "    --version,       Output version information and exit\n\n");
 
   exit(status);
@@ -37,10 +45,14 @@ int main(int argc, char *argv[]) {
   int min = -1, max = -1;
   int exclude = 0;
   int count = 0;
+  int convert = 0;
   int length = 50;
+  long value;
+  char *end;
 
   extern char *optarg; /* external from getopt */
-  static int verbose_flag = 0; /* global for other code */
+
+  verbose_flag = 0; /* assume not verbose */
 
   progname = argv[0];
   if (argc < 4) {
@@ -50,74 +62,107 @@ int main(int argc, char *argv[]) {
   while(1) {
     static struct option long_options[] =
         {
-          /* These options set a flag. */
-          {"verbose",  no_argument,       &verbose_flag, 1},
-          {"brief",    no_argument,       &verbose_flag, 0},
-          /* These options don't set a flag.
-             We distinguish them by their indices.
-          {"add",     no_argument,       0, 'a'},
-          {"append",  no_argument,       0, 'b'}, */
+          {"verbose", no_argument, 0, 'v'},
+          {"convert", no_argument, 0, 'c'},
+          {"exclude", no_argument, 0, 'e'},
+          {"version", no_argument, 0, 'V'},
+          {"help",    no_argument, 0, 'h'},
           {"input",   required_argument, 0, 'i'},
           {"names",   required_argument, 0, 'n'},
           {"min",     required_argument, 0, 'm'},
           {"max",     required_argument, 0, 'a'},
           {"length",  required_argument, 0, 'l'},
-          {"exclude", no_argument, 0, 'e'},
-          {"version", no_argument, 0, 'V'},
-          {"help",    no_argument, 0, 'h'},
+          {"quality", required_argument, 0, 'q'},
           {0, 0, 0, 0}
         };
 
     /* getopt_long stores the option index here. */
     int option_index = 0;
  
-    c = getopt_long (argc, argv, "Vh?ei:n:m:a:l:", long_options, &option_index);
+    c = getopt_long (argc, argv, "Vvh?ecq:i:n:m:a:l:", long_options, &option_index);
  
     /* Detect the end of the options. */
     if (c == -1)
       break;
  
     switch (c) {
-      case 0:
-        /* If this option set a flag, do nothing else now. */
-        if (long_options[option_index].flag != 0)
-          break;
-        printf ("option %s", long_options[option_index].name);
-        if (optarg)
-          printf (" with arg %s", optarg);
-        printf ("\n");
+      case 'v':
+        verbose_flag = 1;
         break;
- 
+
       case 'i':
-        DEBUGP("Input file (-i) has value `%s'\n", optarg);
+        if (verbose_flag)
+			fprintf(stderr,"Input file (-i) has value `%s'\n", optarg);
         in = (char*) malloc(strlen(optarg)+1);
         strcpy(in,optarg);
         break;
      
       case 'n':
-        DEBUGP("Names file (-n) has value `%s'\n", optarg);
+        if (verbose_flag)
+			fprintf(stderr,"Names file (-n) has value `%s'\n", optarg);
         names = (char*) malloc(strlen(optarg)+1);
         strcpy(names,optarg);
         break;
 
       case 'm':
-        DEBUGP("Minimum value (-m) is `%s'\n", optarg);
-        min = atoi(optarg);
+        if (verbose_flag)
+			fprintf(stderr,"Minimum value (-m) is `%s'\n", optarg);
+		value = strtol(optarg,&end,0);
+		if (*end == '\0' && errno == 0) {
+				min = atoi(optarg);
+		} else {
+				fprintf(stderr, "Maximum value (-m) argument '%s' is not an integer\n",optarg);
+				return EXIT_FAILURE;
+		}
         break;
  
       case 'a':
-        DEBUGP("Maximum value (-a) is `%s'\n", optarg);
-        max = atoi(optarg);
+        if (verbose_flag)
+			fprintf(stderr,"Maximum value (-a) is `%s'\n", optarg);
+
+		value = strtol(optarg,&end,0);
+		if (*end == '\0' && errno == 0) {
+				max = atoi(optarg);
+		} else {
+				fprintf(stderr, "Maximum value (-a) argument '%s' is not an integer\n",optarg);
+				return EXIT_FAILURE;
+		}
+        break;
+
+      case 'c':
+        if (verbose_flag)
+			fprintf(stderr,"Output will be converted\n");
+        convert = 1;
+        break;
+
+      case 'q':
+        if (verbose_flag)
+			fprintf(stderr, "Quality score (-q) is '%s'\n", optarg);
+		value = strtol(optarg,&end,0);
+		if (*end == 0 && errno == 0) {
+				QUALITY_SCORE = atoi(optarg);
+		} else {
+				fprintf(stderr, "Quality ASCII value (-q) is invalid - must be an ASCII code (e.g. 73, which is 'I')\n");
+				return EXIT_FAILURE;
+		}
         break;
 
       case 'e':
-        DEBUGP("Items in names file will be excluded\n",NULL);
+        if (verbose_flag)
+			fprintf(stderr,"Items in names file will be excluded\n");
         exclude = 1;
         break;
 
       case 'l':
-        DEBUGP("Sequence characters per line set to %i\n",length);
-        length = atoi(optarg);
+        if (verbose_flag)
+			fprintf(stderr,"Sequence characters per line set to %i\n",length);
+		value = strtol(optarg,&end,0);
+		if (*end == '\0' && errno == 0) {
+			length = atoi(optarg);
+		} else {
+				fprintf(stderr, "Sequence length value (-l) argument '%s' is not an integer\n",optarg);
+				return EXIT_FAILURE;
+		}
         break;
 
       case 'V':
@@ -142,14 +187,14 @@ int main(int argc, char *argv[]) {
    and '--brief' as they are encountered,
    we report the final status resulting from them. */
   if (verbose_flag)
-    puts ("verbose flag is set");
+    fprintf(stderr, "verbose flag is set\n");
  
    /* Print any remaining command line arguments (not options). */
   if (optind < argc) {
 	  if (verbose_flag) 
-		printf ("non-option ARGV-elements: ");
+		fprintf(stderr,"non-option ARGV-elements: ");
 	while (optind < argc)
-	printf ("%s ", argv[optind++]);
+		printf ("%s ", argv[optind++]);
 	putchar ('\n');
   }
 
@@ -174,9 +219,9 @@ int main(int argc, char *argv[]) {
   }
 
   if (names) {
-    count = pull_by_name(in,names,min,max,length);
+    count = pull_by_name(in,names,min,max,length,exclude,convert);
   } else {
-    count = pull_by_size(in,min,max,length);
+    count = pull_by_size(in,min,max,length,convert);
   }
 
   free(in);

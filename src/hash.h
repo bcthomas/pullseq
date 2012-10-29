@@ -14,5 +14,6 @@ lookup_t *find_name(char *name);
 void delete_name(lookup_t *s);
 void delete_hash(void);
 void print_hash(void);
+int hash_key_count(void);
 
 #endif
