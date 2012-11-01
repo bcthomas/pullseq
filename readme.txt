@@ -1,6 +1,6 @@
 Summary:
   pullseq: extract sequences from a fasta/fastq file.  This program is
-  fast, and can useful in a variety of situations.  You can use it to
+  fast, and can be useful in a variety of situations.  You can use it to
   extract sequences from one fasta/fastq file into a new file, given
   either a list of header ids to include / exclude or a size minimum /
   maximum.
