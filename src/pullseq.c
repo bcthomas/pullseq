@@ -91,22 +91,16 @@ int main(int argc, char *argv[]) {
         break;
 
       case 'i':
-        if (verbose_flag)
-			fprintf(stderr,"Input file (-i) has value `%s'\n", optarg);
         in = (char*) malloc(strlen(optarg)+1);
         strcpy(in,optarg);
         break;
      
       case 'n':
-        if (verbose_flag)
-			fprintf(stderr,"Names file (-n) has value `%s'\n", optarg);
         names = (char*) malloc(strlen(optarg)+1);
         strcpy(names,optarg);
         break;
 
       case 'm':
-        if (verbose_flag)
-			fprintf(stderr,"Minimum value (-m) is `%s'\n", optarg);
 		value = strtol(optarg,&end,0);
 		if (*end == '\0' && errno == 0) {
 				min = atoi(optarg);
@@ -117,9 +111,6 @@ int main(int argc, char *argv[]) {
         break;
  
       case 'a':
-        if (verbose_flag)
-			fprintf(stderr,"Maximum value (-a) is `%s'\n", optarg);
-
 		value = strtol(optarg,&end,0);
 		if (*end == '\0' && errno == 0) {
 				max = atoi(optarg);
@@ -130,14 +121,10 @@ int main(int argc, char *argv[]) {
         break;
 
       case 'c':
-        if (verbose_flag)
-			fprintf(stderr,"Output will be converted\n");
         convert = 1;
         break;
 
       case 'q':
-        if (verbose_flag)
-			fprintf(stderr, "Quality score (-q) is '%s'\n", optarg);
 		value = strtol(optarg,&end,0);
 		if (*end == 0 && errno == 0) {
 				QUALITY_SCORE = atoi(optarg);
@@ -148,14 +135,10 @@ int main(int argc, char *argv[]) {
         break;
 
       case 'e':
-        if (verbose_flag)
-			fprintf(stderr,"Items in names file will be excluded\n");
         exclude = 1;
         break;
 
       case 'l':
-        if (verbose_flag)
-			fprintf(stderr,"Sequence characters per line set to %i\n",length);
 		value = strtol(optarg,&end,0);
 		if (*end == '\0' && errno == 0) {
 			length = atoi(optarg);
@@ -186,18 +169,23 @@ int main(int argc, char *argv[]) {
    /* Instead of reporting '--verbose'
    and '--brief' as they are encountered,
    we report the final status resulting from them. */
-  if (verbose_flag)
-    fprintf(stderr, "verbose flag is set\n");
+	if (verbose_flag) {
+		fprintf(stderr, "verbose flag is set\n");
+		fprintf(stderr,"Input is %s\n", in);
+		if (convert)
+			fprintf(stderr,"Input will be converted between FASTQ and FASTA\n");
+		if (exclude)
+			fprintf(stderr,"Names in %s will be excluded\n", names);
+		else
+			fprintf(stderr,"Names in %s will be included\n", names);
+		if (max > 0)
+			fprintf(stderr,"Only sequences less than %i will be output\n", max);
+		if (min > 0)
+			fprintf(stderr,"Only sequences greater than %i will be output\n", min);
+		if (length > 0)
+			fprintf(stderr,"Output will be %i columns long\n", length);
+	}
  
-   /* Print any remaining command line arguments (not options). */
-  if (optind < argc) {
-	  if (verbose_flag) 
-		fprintf(stderr,"non-option ARGV-elements: ");
-	while (optind < argc)
-		printf ("%s ", argv[optind++]);
-	putchar ('\n');
-  }
-
   /* check validity of given argument set */
   if (!in) {
     fprintf (stderr, "Error: Input file is required.\n");

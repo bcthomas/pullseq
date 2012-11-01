@@ -33,10 +33,10 @@ int pull_by_size(char *input_file, int min, int max,int length, int convert) {
 	seq = kseq_init(fp);
 
 	/* determine file type */
-	l = kseq_read(seq);
-	if (seq->qual.s == NULL)
-		is_fasta = 1;
-	kseq_rewind(seq);
+	l = kseq_read(seq); /* read the first sequence */
+	is_fasta = seq->qual.s == NULL ? 1 : 0;
+	gzrewind(fp); 
+	kseq_rewind(seq); /* rewind to beginning for main loop */
 
     if (verbose_flag) {
         if (is_fasta)

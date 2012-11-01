@@ -71,7 +71,8 @@ int pull_by_name(char *input_file, char *names_file, int min, int max, int lengt
 	/* determine file type */
 	l = kseq_read(seq); /* read the first sequence */
 	is_fasta = seq->qual.s == NULL ? 1 : 0;
-	kseq_rewind(seq); /* rewind to beginning for main loop */
+	gzrewind(fp); /* rewind to beginning for main loop */
+	kseq_rewind(seq);
 
 	if (verbose_flag) {
 		if (is_fasta)
