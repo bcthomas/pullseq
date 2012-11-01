@@ -9,7 +9,7 @@ Summary:
   can change the length of the output sequence lines.
 
   NOTE: pullseq prints to standard out, so you need to use redirection
-  (>) to create outpus files.
+  (e.g. pullseq input.fasta -m 10 *>* output.fasta ) to create output files.
 
 Synopsis:
   # general extraction with a list of names
