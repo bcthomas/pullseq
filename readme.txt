@@ -3,10 +3,13 @@ Summary:
   fast, and can be useful in a variety of situations.  You can use it to
   extract sequences from one fasta/fastq file into a new file, given
   either a list of header ids to include / exclude or a size minimum /
-  maximum.
+  maximum sequence lengths.
 
   Additionally, it can convert from fastq to fasta or visa-versa and
   can change the length of the output sequence lines.
+
+  NOTE: pullseq prints to standard out, so you need to use redirection
+  (>) to create outpus files.
 
 Synopsis:
   # general extraction with a list of names
