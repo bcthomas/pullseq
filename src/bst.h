@@ -1,4 +1,5 @@
-
+#ifndef BST_H
+#define BST_H
 typedef struct _node {
   char *name;
   struct _node *left;
@@ -19,3 +20,4 @@ int compare(char *left, char *right);
 void print_inorder(node_t *node);
 void print_preorder(node_t *node);
 void print_postorder(node_t *node);
+#endif

@@ -33,3 +33,13 @@ Synopsis:
     -h, --help,      Display this help and exit
     -v, --verbose,   Print extra details during the run
     --version,       Output version information and exit
+
+REQUIREMENTS:
+  Pullseq requires a C compiler and has been tested to work with
+  either GCC or clang. Pullseq also requires and includes kseq.h
+  (Heng Li).
+
+  Pullseq (actually kseq.h) also requires Zlib (so your linker
+  should be able to handle the '-lz' option).  You can obtain zlib
+  from http://www.zlib.net/ or commonly from your OS package manager
+  (e.g. apt-get zlib or emerge zlib).

@@ -1,4 +1,5 @@
-
+#ifndef LINKED_LIST_H
+#define LINKED_LIST_H
 typedef struct _node {
   char *word;
   struct _node *next;
@@ -14,3 +15,4 @@ node * initnode(char *word);
 void add_to_list(list_t *list, node *n);
 node *search_list(list_t *list, char *word);
 void delete_list(list_t *list,node *n);
+#endif

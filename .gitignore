@@ -9,3 +9,5 @@ test/t1000000.fq
 test/t1000000.txt
 test/t10000000.fq
 test/t10000000.txt
+test/big_test.fastq
+test/big_test.txt
