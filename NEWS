@@ -1,0 +1,2 @@
+02/27/2013: converted pullseq to use autotools for
+            configuration/building/installation

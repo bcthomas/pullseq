@@ -20,7 +20,8 @@ extern char const *progname;
 extern int verbose_flag;
 
 int pull_by_name(char *input_file, char *names_file, int min, int max, int length, int exclude, int convert) {
-	FILE *fp;
+	FILE *names_fp;
+	gzFile fp;
 	int i,l,capacity=80;
 	int count=0,excluded=0;
 	int is_fasta = -1;
@@ -28,8 +29,8 @@ int pull_by_name(char *input_file, char *names_file, int min, int max, int lengt
 	char *line;
 	kseq_t *seq;
 
-	fp = fopen(names_file,"r");
-	if (!fp) {
+	names_fp = fopen(names_file,"r");
+	if (!names_fp) {
 		fprintf(stderr,"%s - failed to open file %s\n",progname,names_file);
 		exit(EXIT_FAILURE);
 	}
@@ -41,7 +42,7 @@ int pull_by_name(char *input_file, char *names_file, int min, int max, int lengt
 		exit(EXIT_FAILURE);
 	}
 
-	while((i = getl(&line,fp)) != -1) {
+	while((i = getl(&line,names_fp)) != -1) {
 		fasta_name = parse_name(line);
 		if (fasta_name) {
 			add_name(fasta_name);             /* add fasta_name to hash */
@@ -49,7 +50,7 @@ int pull_by_name(char *input_file, char *names_file, int min, int max, int lengt
 	}
 
 	free(line); /* free up line */
-	fclose(fp); /* close file */
+	fclose(names_fp); /* close file */
 
 	if (verbose_flag) {
 		fprintf(stderr,"\n");

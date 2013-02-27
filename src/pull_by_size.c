@@ -18,7 +18,7 @@ extern char const *progname;
 extern int verbose_flag;
 
 int pull_by_size(char *input_file, int min, int max,int length, int convert) {
-	FILE *fp;
+	gzFile fp;
 	int count=0,l;
 	int is_fasta = 0; /* assume fastq */
 	kseq_t *seq;

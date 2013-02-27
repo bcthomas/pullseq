@@ -11,3 +11,17 @@ test/t10000000.fq
 test/t10000000.txt
 test/big_test.fastq
 test/big_test.txt
+.deps
+Makefile
+Makefile.in
+aclocal.m4
+*.log
+stamp-h1
+config.*
+/src/config.*
+/autom4te.cache
+/compile
+/configure
+/depcomp
+/install-sh
+/missing

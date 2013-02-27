@@ -43,3 +43,13 @@ REQUIREMENTS:
   should be able to handle the '-lz' option).  You can obtain zlib
   from http://www.zlib.net/ or commonly from your OS package manager
   (e.g. apt-get zlib or emerge zlib).
+
+INSTALL:
+  To install pullseq, do the following in a shell on your system...
+
+  git clone https://github.com/bcthomas/pullseq.git # checkout the code using git
+  cd pullseq
+  ./bootstrap  # get set up for config/build after cloning
+  ./configure  # configure the application based on your system
+  make         # will build the application
+  make install # will install in /usr/local by default

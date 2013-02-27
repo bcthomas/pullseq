@@ -1,0 +1,68 @@
+2013-02-26 12:39:31 -0800 Brian C. Thomas 
+
+	* updated headers and readme (HEAD, master)
+
+2012-11-01 08:23:16 -0700 Brian C. Thomas 
+
+	* more typos (origin/master)
+
+2012-11-01 08:22:05 -0700 Brian C. Thomas 
+
+	* more readme touchups
+
+2012-11-01 08:19:58 -0700 Brian C. Thomas 
+
+	* typo in readme
+
+2012-11-01 08:17:05 -0700 Brian C. Thomas 
+
+	* updated readme
+
+2012-11-01 07:59:00 -0700 Brian C. Thomas 
+
+	* fix rewind bug and clean up verbose messages
+
+2012-10-29 13:06:33 -0700 Brian C. Thomas 
+
+	* updated uthash branch to current
+
+2012-04-27 16:39:16 -0700 Brian C. Thomas 
+
+	* more test dir cleanup for github
+
+2012-04-27 15:57:19 -0700 Brian C. Thomas 
+
+	* removed big testing files from repo
+
+2012-04-27 14:28:18 -0700 Brian C. Thomas 
+
+	* convert to uthash for names file
+
+2012-04-25 10:25:29 -0700 Brian C. Thomas 
+
+	* completed binary tree implementation
+
+2012-04-18 19:52:08 -0700 Brian C. Thomas 
+
+	* restructured header files (origin/linklist, linklist)
+
+2012-04-18 16:44:51 -0700 Brian C. Thomas 
+
+	* updated arg parsing
+
+2012-04-18 15:32:53 -0700 Brian C. Thomas 
+
+	* see previous commit - forgot this file
+
+2012-04-18 15:31:02 -0700 Brian C. Thomas 
+
+	* Completed linked-list version
+
+2012-04-18 09:07:08 -0700 Brian C. Thomas 
+
+	* updated Makefile - added uthash.h
+
+2012-04-18 09:04:06 -0700 Brian C. Thomas 
+
+	* initial commit
+
