@@ -5,7 +5,7 @@ AC_PREREQ([2.68])
 AC_INIT([pullseq], [0.1], [bct.x42@gmail.com])
 #AC_CONFIG_AUX_DIR(config)
 AM_INIT_AUTOMAKE([foreign])
-AC_CONFIG_SRCDIR([src])
+AC_CONFIG_SRCDIR([src/pullseq.c])
 AC_CONFIG_HEADERS([src/config.h])
 
 # Checks for programs.
