@@ -1,10 +1,18 @@
+2013-02-27 14:48:29 -0800 Brian C. Thomas 
+
+	* removed leftover junk (HEAD, master)
+
+2013-02-27 14:46:20 -0800 Brian C. Thomas 
+
+	* convert to autotools! (origin/master)
+
 2013-02-26 12:39:31 -0800 Brian C. Thomas 
 
-	* updated headers and readme (HEAD, master)
+	* updated headers and readme
 
 2012-11-01 08:23:16 -0700 Brian C. Thomas 
 
-	* more typos (origin/master)
+	* more typos
 
 2012-11-01 08:22:05 -0700 Brian C. Thomas 
 
