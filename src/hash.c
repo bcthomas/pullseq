@@ -16,6 +16,10 @@ void add_name(char *name)
 		exit(EXIT_FAILURE);
 	}
 	s->name = (char *)malloc(strlen(name) + 1);
+	if (s->name == NULL) {
+		fprintf(stderr,"couldn't get memory for name string\n");
+		exit(EXIT_FAILURE);
+	}
 	strcpy(s->name,name);
 
 	HASH_ADD_KEYPTR( hh, lookup, s->name, strlen(s->name), s );
