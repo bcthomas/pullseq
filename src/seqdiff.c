@@ -17,16 +17,16 @@ void show_usage(int status) {
 	fprintf(stderr, "\n(Written by bct - 2013)     ");
 	/*  fprintf(stderr, "search method: %s",PULLSEQ_SORTMETHOD); */
 	fprintf(stderr, "\nUsage:\n"
-			"%s <first input fasta/fastq file> <second fasta/fastq file>\n\n", progname);
+			"%s -1 <first input fasta/fastq file> -2 <second fasta/fastq file>\n\n", progname);
 	fprintf(stderr, "  Options:\n"
-			"    -1, --first,      First sequence file\n"
-			"    -2, --second,     Second sequence file\n");
+			"    -1, --first,      First sequence file (required)\n"
+			"    -2, --second,     Second sequence file (required)\n");
 	fprintf(stderr, "    -a, --a_output,   File name for uniques from first file\n"
 			"    -b, --b_output,   File name for uniques from second file\n"
 			"    -c, --c_output,   File name for common entries\n");
 
 	fprintf(stderr, "    -d, --headers,    Compare headers instead of sequences (default: false)\n"
-			"    -g, --include_gt, If comparing headers, include '>' in output? (default: false)\n");
+			"    -s, --summary, Just show summary stats? (default: false)\n");
 	fprintf(stderr, "    -h, --help,       Display this help and exit\n"
 			"    -v, --verbose,    Print extra details during the run\n"
 			"    --version,        Output version information and exit\n\n");
@@ -41,8 +41,11 @@ int main(int argc, char *argv[]) {
 	char *a_output_file = NULL;
 	char *b_output_file = NULL;
 	char *c_output_file = NULL;
-	int use_headers = 0;
-	int use_gt = 0;
+	FILE *a_output_fp = NULL;
+	FILE *b_output_fp = NULL;
+	FILE *c_output_fp = NULL;
+	int use_header = 0;
+	int only_summarize = 0;
 
 	/* internal variables */
 	seqdiff_results_t *results;
@@ -59,11 +62,11 @@ int main(int argc, char *argv[]) {
 	while(1) {
 		static struct option long_options[] =
 		{
-			{"include_gt", no_argument, 0, 'g'},
-			{"headers",    no_argument, 0, 'd'},
 			{"verbose",    no_argument, 0, 'v'},
 			{"version",    no_argument, 0, 'V'},
 			{"help",       no_argument, 0, 'h'},
+			{"summary",    no_argument, 0, 's'},
+			{"headers",    no_argument, 0, 'd'},
 			{"first",      required_argument, 0, '1'},
 			{"second",     required_argument, 0, '2'},
 			{"a_output",   required_argument, 0, 'a'},
@@ -75,7 +78,7 @@ int main(int argc, char *argv[]) {
 		/* getopt_long stores the option index here. */
 		int option_index = 0;
 
-		c = getopt_long(argc, argv, "vVh?dg1:2:a:b:c:", long_options, &option_index);
+		c = getopt_long(argc, argv, "vVh?sd1:2:a:b:c:", long_options, &option_index);
 
 		/* Detect the end of the options. */
 		if (c == -1)
@@ -99,12 +102,12 @@ int main(int argc, char *argv[]) {
 				/* getopt_long already printed an error message. */
 				break;
 
-			case 'd':
-				use_headers = 1;
+			case 's':
+				only_summarize = 1;
 				break;
 
-			case 'g':
-				use_gt = 1;
+			case 'd':
+				use_header = 1;
 				break;
 
 			case '1':
@@ -152,12 +155,12 @@ int main(int argc, char *argv[]) {
 		} else
 			fprintf(stderr,"No output files will be generated\n");
 
-		if (use_headers)
+		if (use_header)
 			fprintf(stderr,"Processing will be done using headers, not sequences\n");
 		else
 			fprintf(stderr,"Processing will be done using sequences\n");
-		if (use_gt && use_headers)
-			fprintf(stderr,"'>' will be included in output\n");
+		if (only_summarize)
+			fprintf(stderr,"Only showing summary information\n");
 	}
 
 	/* check validity of given argument combination */
@@ -171,29 +174,43 @@ int main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	if (use_headers == 0 && use_gt == 1) {
-		fprintf (stderr, "WARNING: Ignoring -g option since -d option is not set.\n");
-	}
-
 	results->first_file = first_file;
 	results->second_file = second_file;
-	results->a_output_file = a_output_file;
-	results->b_output_file = b_output_file;
-	results->c_output_file = c_output_file;
-	results->use_headers = use_headers;
-	results->use_gt = use_gt;
+	results->use_header = use_header;
+	results->only_summarize = only_summarize;
 	if (a_output_file != NULL && b_output_file != NULL && c_output_file != NULL) {
-		cmpseq_with_output(results);
-	} else {
-		cmpseq(results);
+		results->a_output_fp = fopen(a_output_file,"w+");
+		if (!results->a_output_fp) {
+			fprintf(stderr,"%s - failed to open file %s\n",progname,a_output_file);
+			exit(EXIT_FAILURE);
+		}
+		results->b_output_fp = fopen(b_output_file,"w+");
+		if (!results->b_output_fp) {
+			fprintf(stderr,"%s - failed to open file %s\n",progname,b_output_file);
+			exit(EXIT_FAILURE);
+		}
+		results->c_output_fp = fopen(c_output_file,"w+");
+		if (!results->c_output_fp) {
+			fprintf(stderr,"%s - failed to open file %s\n",progname,c_output_file);
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	/* do the comparison */
+	cmpseq(results);
+
+	if (a_output_file != NULL && b_output_file != NULL && c_output_file != NULL) {
+		fclose(results->a_output_fp);
+		fclose(results->b_output_fp);
+		fclose(results->c_output_fp);
 	}
 
 	/* report results */
-	fprintf(stdout, "first_file_total = %d\n", results->first_file_total);
-	fprintf(stdout, "first_file_uniq = %d\n",  results->first_file_uniq);
-	fprintf(stdout, "second_file_total = %d\n",results->second_file_total);
-	fprintf(stdout, "second_file_uniq = %d\n", results->second_file_uniq);
-	fprintf(stdout, "common = %d\n",           results->common);
+	fprintf(stderr, " first_file_total = %d\n", results->first_file_total);
+	fprintf(stderr, "  first_file_uniq = %d\n", results->first_file_uniq);
+	fprintf(stderr, "second_file_total = %d\n", results->second_file_total);
+	fprintf(stderr, " second_file_uniq = %d\n", results->second_file_uniq);
+	fprintf(stderr, "           common = %d\n",           results->common);
 
 	free(first_file);
 	free(second_file);

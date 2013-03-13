@@ -1,6 +1,8 @@
 #ifndef SEQDIFF_RESULTS_H
 #define SEQDIFF_RESULTS_H
 
+#include <stdio.h>
+
 typedef struct _seqdiff_results_t {
 	int first_file_total;
 	int first_file_uniq;
@@ -9,11 +11,11 @@ typedef struct _seqdiff_results_t {
 	int common;
 	char *first_file;
 	char *second_file;
-	char *a_output_file;
-	char *b_output_file;
-	char *c_output_file;
-	int use_headers;
-	int use_gt;
+	FILE *a_output_fp;
+	FILE *b_output_fp;
+	FILE *c_output_fp;
+	int use_header;
+	int only_summarize;
 } seqdiff_results_t;
 
 seqdiff_results_t *seqdiff_results_init(void);

@@ -2,7 +2,6 @@
 #define HASH_H
 
 #include "global.h"
-#include "uthash.h"
 
 typedef struct lookup {
 	char *name;

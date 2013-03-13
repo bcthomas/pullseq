@@ -9,8 +9,6 @@
 #include "file_read.h"
 #include "global.h"
 #include "output.h"
-#include "kseq.h"
-#include "uthash.h"
 
 __KS_GETC(gzread, BUFFER_SIZE)
 __KS_GETUNTIL(gzread, BUFFER_SIZE)

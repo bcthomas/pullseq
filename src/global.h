@@ -12,9 +12,9 @@
 
 #include "zlib.h"
 #include "kseq.h"
-#define BUFFER_SIZE 65535
+#include "uthash.h"
 
-#include "seqdiff_results.h"
+#define BUFFER_SIZE 65535
 
 __KS_TYPE(gzFile)
 __KS_BASIC(gzFile, BUFFER_SIZE)

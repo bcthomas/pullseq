@@ -15,8 +15,13 @@ seqdiff_results_t *seqdiff_results_init(void) {
 	r->second_file_total = 0;
 	r->second_file_uniq = 0;
 	r->common = 0;
-	r->use_headers = 0;
-	r->use_gt = 0;
+	r->first_file = NULL;
+	r->second_file = NULL;
+	r->a_output_fp = NULL;
+	r->b_output_fp = NULL;
+	r->c_output_fp = NULL;
+	r->use_header = 0;
+	r->only_summarize = 0;
 	return r;
 }
 

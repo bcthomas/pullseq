@@ -3,7 +3,6 @@
 #include <string.h>
 
 #include "global.h"
-#include "kseq.h"
 
 extern char const *progname;
 extern int verbose_flag;
@@ -79,6 +78,49 @@ void print_fasta_seq(kseq_t *seq, int n)
 	free(seqbuf);
 }
 
+void print_fasta(FILE *fp, char *name, char *comment, char *seq)
+{
+	int l = strlen(seq);   /* sequence length */
+	int x,i=0;
+	int n = 50;
+	char *seqbuf = NULL;
+	seqbuf = (char *)malloc(sizeof(char) * (n + 1));
+	if (seqbuf == NULL) {
+		fprintf(stderr,"print_seq: out of memory for seqbuf!\n");
+		exit(EXIT_FAILURE);
+	}
+
+	if (l > n) {                  /* seqlength is > column length - split sequence */
+		if (comment == NULL)
+			fprintf(fp, ">%s\n",name);
+		else
+			fprintf(fp, ">%s %s\n",name,comment);
+
+		for (x=0; x<l;x++) {
+			if (i < n) {                     /* there's less sequence than the column width */
+				seqbuf[i] = seq[x];
+				i++;
+			} else {                         /* i is >= column width, so print this line */
+				seqbuf[i] = '\0';            /* set last position in string to null */
+				fprintf(fp, "%s\n",seqbuf);       /* print this line */
+				i = 0;                       /* reset i */
+				seqbuf[0] = '\0';            /* reset buffer */
+				seqbuf[i] = seq[x];   /* set this buffer line to current sequence char */
+				i++;
+			}
+		}
+		if (i<n)
+			seqbuf[i] = '\0';
+		if (strlen(seqbuf) > 0)
+			fprintf(fp, "%s\n",seqbuf);
+	} else {                     /* seqlength < column length, so just print the full sequence */
+		if (comment == NULL)
+			fprintf(fp, ">%s\n%s\n",name,seq);
+		else
+			fprintf(fp, ">%s %s\n%s\n",name,comment,seq);
+	}
+	free(seqbuf);
+}
 
 
 
