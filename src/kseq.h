@@ -43,6 +43,7 @@
     char *buf;                                  \
     int begin, end, is_eof;                     \
     type_t f;                                   \
+	int is_fasta;                               \
   } kstream_t;
 
 #define ks_eof(ks) ((ks)->is_eof && (ks)->begin >= (ks)->end)
@@ -59,10 +60,10 @@
         static inline void ks_destroy(kstream_t *ks)                    \
 	{                                                               \
           if (ks) {                                                     \
-          free(ks->buf);                                                \
-          free(ks);                                                     \
-        }                                                               \
-          }
+            free(ks->buf);                                                \
+            free(ks);                                                     \
+          }                                                               \
+    }
 
 #define __KS_GETC(__read, __bufsize)                                    \
   static inline int ks_getc(kstream_t *ks)				\
@@ -99,13 +100,13 @@ typedef struct __kstring_t {
              int i;                                                     \
              if (ks->begin >= ks->end) {                                \
                if (!ks->is_eof) {                                       \
-               ks->begin = 0;                                           \
-               ks->end = __read(ks->f, ks->buf, __bufsize);             \
-               if (ks->end < __bufsize) ks->is_eof = 1;                 \
-               if (ks->end == 0) break;                                 \
-             } else break;                                              \
+                 ks->begin = 0;                                           \
+                 ks->end = __read(ks->f, ks->buf, __bufsize);             \
+                 if (ks->end < __bufsize) ks->is_eof = 1;                 \
+                 if (ks->end == 0) break;                                 \
+               } else break;                                              \
              }                                                          \
-               if (delimiter > KS_SEP_MAX) {                            \
+             if (delimiter > KS_SEP_MAX) {                            \
                for (i = ks->begin; i < ks->end; ++i)                    \
                  if (ks->buf[i] == delimiter) break;                    \
              } else if (delimiter == KS_SEP_SPACE) {                    \
@@ -115,29 +116,29 @@ typedef struct __kstring_t {
                for (i = ks->begin; i < ks->end; ++i)                    \
                  if (isspace(ks->buf[i]) && ks->buf[i] != ' ') break;   \
              } else i = 0; /* never come to here! */                    \
-               if (str->m - str->l < i - ks->begin + 1) {               \
+             if (str->m - str->l < i - ks->begin + 1) {               \
                str->m = str->l + (i - ks->begin) + 1;                   \
                kroundup32(str->m);                                      \
                str->s = (char*)realloc(str->s, str->m);                 \
              }                                                          \
-               memcpy(str->s + str->l, ks->buf + ks->begin, i - ks->begin); \
-               str->l = str->l + (i - ks->begin);                       \
-               ks->begin = i + 1;                                       \
-               if (i < ks->end) {                                       \
+             memcpy(str->s + str->l, ks->buf + ks->begin, i - ks->begin); \
+             str->l = str->l + (i - ks->begin);                       \
+             ks->begin = i + 1;                                       \
+             if (i < ks->end) {                                       \
                if (dret) *dret = ks->buf[i];                            \
-               break;                                                   \
+				   break;                                                   \
              }                                                          \
-             }                                                          \
-               if (str->l == 0) {                                       \
+            }                                                          \
+            if (str->l == 0) {                                       \
                str->m = 1;                                              \
                str->s = (char*)calloc(1, 1);                            \
-             }                                                          \
-               str->s[str->l] = '\0';                                   \
-               return str->l;                                           \
-               }
+            }                                                          \
+            str->s[str->l] = '\0';                                   \
+            return str->l;                                           \
+          }
 
 #define KSTREAM_INIT(type_t, __read, __bufsize)                         \
-  __KS_TYPE(type_t)							\
+  __KS_TYPE(type_t)							                            \
   __KS_BASIC(type_t, __bufsize)                                         \
   __KS_GETC(__read, __bufsize)                                          \
   __KS_GETUNTIL(__read, __bufsize)
@@ -148,19 +149,19 @@ typedef struct __kstring_t {
    kseq_t *s = (kseq_t*)calloc(1, sizeof(kseq_t));                      \
    s->f = ks_init(fd);                                                  \
    return s;                                                            \
-   }                                                                    \
+  }                                                                    \
   static inline void kseq_rewind(kseq_t *ks)                            \
   {                                                                     \
    ks->last_char = 0;                                                   \
    ks->f->is_eof = ks->f->begin = ks->f->end = 0;                       \
-   }                                                                    \
+  }                                                                    \
   static inline void kseq_destroy(kseq_t *ks)                           \
   {                                                                     \
    if (!ks) return;                                                     \
    free(ks->name.s); free(ks->comment.s); free(ks->seq.s);	free(ks->qual.s); \
    ks_destroy(ks->f);                                                   \
    free(ks);                                                            \
-   }
+  }
 
 /* Return value:
    >=0  length of the sequence (normal)
@@ -173,10 +174,10 @@ typedef struct __kstring_t {
    int c;                                                               \
    kstream_t *ks = seq->f;                                              \
    if (seq->last_char == 0) { /* then jump to the next header line */   \
-                             while ((c = ks_getc(ks)) != -1 && c != '>' && c != '@'); \
-                             if (c == -1) return -1; /* end of file */  \
-                             seq->last_char = c;                        \
-                             } /* the first header char has been read */ \
+	 while ((c = ks_getc(ks)) != -1 && c != '>' && c != '@'); \
+	 if (c == -1) return -1; /* end of file */  \
+	 seq->last_char = c;                        \
+   } /* the first header char has been read */ \
    seq->comment.l = seq->seq.l = seq->qual.l = 0;                       \
    if (ks_getuntil(ks, 0, &seq->name, &c) < 0) return -1;               \
    if (c != '\n') ks_getuntil(ks, '\n', &seq->comment, 0);              \
@@ -190,8 +191,14 @@ typedef struct __kstring_t {
      seq->seq.s[seq->seq.l++] = (char)c;                                \
    }                                                                    \
    }                                                                    \
-     if (c == '>' || c == '@') seq->last_char = c; /* the first header char has been read */ \
-     seq->seq.s[seq->seq.l] = 0;	/* null terminated string */    \
+     if (c == '>' || c == '@') { /* the first header char has been read */ \
+       seq->last_char = c;                                               \
+       if (c == '>')                               \
+		 ks->is_fasta = 1;                               \
+	   else                               \
+		 ks->is_fasta = 0;                               \
+   }                                                                   \
+     seq->seq.s[seq->seq.l] = 0;	/* null terminated string */         \
      if (c != '+') return seq->seq.l; /* FASTA */                       \
      if (seq->qual.m < seq->seq.m) {	/* allocate enough memory */	\
      seq->qual.m = seq->seq.m;                                          \

@@ -10,9 +10,10 @@
 #endif
 */
 
-#include "kseq.h"
 #include "zlib.h"
+#include "kseq.h"
 #include "uthash.h"
+
 #define BUFFER_SIZE 65535
 
 __KS_TYPE(gzFile)
