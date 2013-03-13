@@ -1,10 +1,34 @@
+2013-03-13 13:26:11 -0700 Brian C. Thomas 
+
+	* finished seqdiff (HEAD, seqdiff)
+
+2013-03-09 14:25:41 -0800 Brian C. Thomas 
+
+	* Completed cmpseq()
+
+2013-02-28 09:44:44 -0800 Brian C. Thomas 
+
+	* updated license to be accurate
+
+2013-02-27 15:10:50 -0800 Brian C. Thomas 
+
+	* updated AC_CONFIG_SRCDIR
+
+2013-02-27 15:02:24 -0800 Brian C. Thomas 
+
+	* modernized for automake 1.13+
+
+2013-02-27 14:49:34 -0800 Brian C. Thomas 
+
+	* updated ChangeLog
+
 2013-02-27 14:48:29 -0800 Brian C. Thomas 
 
-	* removed leftover junk (HEAD, master)
+	* removed leftover junk
 
 2013-02-27 14:46:20 -0800 Brian C. Thomas 
 
-	* convert to autotools! (origin/master)
+	* convert to autotools!
 
 2013-02-26 12:39:31 -0800 Brian C. Thomas 
 

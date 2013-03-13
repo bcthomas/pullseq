@@ -1,5 +1,7 @@
-Summary:
-  pullseq: extract sequences from a fasta/fastq file.  This program is
+This software includes two applications: pullseq and seqdiff.
+
+Pullseq Summary:
+  pullseq - extract sequences from a fasta/fastq file.  This program is
   fast, and can be useful in a variety of situations.  You can use it to
   extract sequences from one fasta/fastq file into a new file, given
   either a list of header ids to include / exclude or a size minimum /
@@ -34,22 +36,56 @@ Synopsis:
     -v, --verbose,   Print extra details during the run
     --version,       Output version information and exit
 
-REQUIREMENTS:
-  Pullseq requires a C compiler and has been tested to work with
-  either GCC or clang. Pullseq also requires and includes kseq.h
-  (Heng Li).
 
-  Pullseq (actually kseq.h) also requires Zlib (so your linker
-  should be able to handle the '-lz' option).  You can obtain zlib
-  from http://www.zlib.net/ or commonly from your OS package manager
-  (e.g. apt-get zlib or emerge zlib).
+Seqdiff Summary:
+  seqdiff - compare two fasta (or fastq) files to determine overlap of
+  sequences.  This overlap can be at the sequence level (are two
+  sequences exactly the same in both files?) or at the header name
+  level (do two sequences contain the same header name between the two
+  files?).
+
+Synopsis:
+  seqdiff -1 first_file.fa -2 second_file.fa
+
+Usage:
+  seqdiff -1 <first input fasta/fastq file> -2 <second fasta/fastq file>
+
+  Options:
+    -1, --first,      First sequence file (required)
+    -2, --second,     Second sequence file (required)
+    -a, --a_output,   File name for uniques from first file
+    -b, --b_output,   File name for uniques from second file
+    -c, --c_output,   File name for common entries
+    -d, --headers,    Compare headers instead of sequences (default: false)
+    -s, --summary,    Just show summary stats? (default: false)
+    -h, --help,       Display this help and exit
+    -v, --verbose,    Print extra details during the run
+    --version,        Output version information and exit
+
+REQUIREMENTS:
+  Pullseq/Seqdiff require a C compiler and has been tested to work with
+  either GCC or clang. They also require (and include) kseq.h (Heng
+  Li) and uthash.h (http://troydhanson.github.com/uthash/).
+
+  kseq.h also requires Zlib (so your linker should be able to handle
+  the '-lz' option).  You can obtain zlib from http://www.zlib.net/
+  or commonly from your OS package manager (e.g. apt-get zlib or
+  emerge zlib).
 
 INSTALL:
-  To install pullseq, do the following in a shell on your system...
+  To install, do the following in a shell on your system...
 
+  From Git:
   git clone https://github.com/bcthomas/pullseq.git # checkout the code using git
   cd pullseq
   ./bootstrap  # get set up for config/build after cloning
+  ./configure  # configure the application based on your system
+  make         # will build the application
+  make install # will install in /usr/local by default
+
+  From a Tar file:
+  tar xvf pullseq_version.tar.gz
+  cd pullseq_version
   ./configure  # configure the application based on your system
   make         # will build the application
   make install # will install in /usr/local by default

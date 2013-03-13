@@ -1,7 +1,6 @@
 *.swp
 *.o
 *.gch
-seqdiff_dev.txt
 src/pullseq
 src/seqdiff
 src/test_hash.c
