@@ -32,7 +32,7 @@ Synopsis:
     -c, --convert,   Convert input to fastq/fasta (e.g. if input is fastq, output will be fasta)
     -q, --quality,   ASCII code to use for fasta->fastq quality conversions
     -e, --excluded,  Exclude the header id names in the list (-n)
-    -t, --count,     Just count the possibly output, but don't write it
+    -t, --count,     Just count the possible output, but don't write it
     -h, --help,      Display this help and exit
     -v, --verbose,   Print extra details during the run
     --version,       Output version information and exit

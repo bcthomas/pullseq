@@ -32,7 +32,7 @@ void show_usage(int status) {
   fprintf(stderr, "    -c, --convert,   Convert input to fastq/fasta (e.g. if input is fastq, output will be fasta)\n");
   fprintf(stderr, "    -q, --quality,   ASCII code to use for fasta->fastq quality conversions\n");
   fprintf(stderr, "    -e, --excluded,  Exclude the header id names in the list (-n)\n");
-  fprintf(stderr, "    -t, --count,     Just count the possibly output, but don't write it\n");
+  fprintf(stderr, "    -t, --count,     Just count the possible output, but don't write it\n");
   fprintf(stderr, "    -h, --help,      Display this help and exit\n");
   fprintf(stderr, "    -v, --verbose,   Print extra details during the run\n");
   fprintf(stderr, "    --version,       Output version information and exit\n\n");
