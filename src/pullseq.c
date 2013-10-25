@@ -15,26 +15,27 @@ extern int verbose_flag;
 
 void show_usage(int status) {
   fprintf(stderr, "pullseq - a bioinformatics tool for manipulating fasta and fastq files\n");
-  fprintf(stderr, "\n(Written by bct - 2012)     ");
-  fprintf(stderr, "search method: %s",PULLSEQ_SORTMETHOD);
-  fprintf(stderr, "\nUsage:\n"
-                  "%s -i <input fasta/fastq file> -n <header names to select>\n\n"
-                  "%s -i <input fasta/fastq file> -m <minimum sequence length>\n\n"
-                  "%s -i <input fasta/fastq file> -m <minimum sequence length> -a <max sequence length>\n\n",
-                  progname,progname,progname);
-  fprintf(stderr, "  Options:\n"
-                  "    -i, --input,     Input fasta/fastq file (required)\n"
-                  "    -n, --names,     File of header id names to select\n");
+  fprintf(stderr, "\nVersion: %s              Search method: %s",PULLSEQ_VERSION,PULLSEQ_SORTMETHOD);
+  fprintf(stderr, "\n(Written by bct - 2012; copyright 2013)\n");
+  fprintf(stderr, "\nUsage:\n");
+  fprintf(stderr, " %s -i <input fasta/fastq file> -n <header names to select>\n\n",progname);
+  fprintf(stderr, " %s -i <input fasta/fastq file> -m <minimum sequence length>\n\n",progname);
+  fprintf(stderr, " %s -i <input fasta/fastq file> -m <minimum sequence length> -a <max sequence length>\n\n",progname);
+  fprintf(stderr, " %s -i <input fasta/fastq file> -t\n\n",progname);
 
-  fprintf(stderr, "    -m, --min,       Minimum sequence length\n"
-                  "    -a, --max,       Maximum sequence length\n"
-                  "    -l, --length,    Sequence characters per line (default 50)\n");
-  fprintf(stderr, "    -c, --convert,   Convert input to fastq/fasta (e.g. if input is fastq, output will be fasta)\n"
-  				  "    -q, --quality,   ASCII code to use for fasta->fastq quality conversions\n"
-                  "    -e, --excluded,  Exclude the header id names in the list (-n)\n");
-  fprintf(stderr, "    -h, --help,      Display this help and exit\n"
-                  "    -v, --verbose,   Print extra details during the run\n"
-                  "    --version,       Output version information and exit\n\n");
+  fprintf(stderr, "  Options:\n");
+  fprintf(stderr, "    -i, --input,     Input fasta/fastq file (required)\n");
+  fprintf(stderr, "    -n, --names,     File of header id names to select\n");
+  fprintf(stderr, "    -m, --min,       Minimum sequence length\n");
+  fprintf(stderr, "    -a, --max,       Maximum sequence length\n");
+  fprintf(stderr, "    -l, --length,    Sequence characters per line (default 50)\n");
+  fprintf(stderr, "    -c, --convert,   Convert input to fastq/fasta (e.g. if input is fastq, output will be fasta)\n");
+  fprintf(stderr, "    -q, --quality,   ASCII code to use for fasta->fastq quality conversions\n");
+  fprintf(stderr, "    -e, --excluded,  Exclude the header id names in the list (-n)\n");
+  fprintf(stderr, "    -t, --count,     Just count the possibly output, but don't write it\n");
+  fprintf(stderr, "    -h, --help,      Display this help and exit\n");
+  fprintf(stderr, "    -v, --verbose,   Print extra details during the run\n");
+  fprintf(stderr, "    --version,       Output version information and exit\n\n");
 
   exit(status);
 }
@@ -45,6 +46,7 @@ int main(int argc, char *argv[]) {
   int min = -1, max = -1;
   int exclude = 0;
   int count = 0;
+  int just_count = 0; /* flag for just counting the output */
   int convert = 0;
   int length = 50;
   long value;
@@ -55,7 +57,7 @@ int main(int argc, char *argv[]) {
   verbose_flag = 0; /* assume not verbose */
 
   progname = argv[0];
-  if (argc < 4) {
+  if (argc < 4) { /* progname + at least 3 other args */
     show_usage(EXIT_FAILURE);
   }
 
@@ -65,6 +67,7 @@ int main(int argc, char *argv[]) {
           {"verbose", no_argument, 0, 'v'},
           {"convert", no_argument, 0, 'c'},
           {"exclude", no_argument, 0, 'e'},
+          {"count",   no_argument, 0, 't'},
           {"version", no_argument, 0, 'V'},
           {"help",    no_argument, 0, 'h'},
           {"input",   required_argument, 0, 'i'},
@@ -79,7 +82,7 @@ int main(int argc, char *argv[]) {
     /* getopt_long stores the option index here. */
     int option_index = 0;
  
-    c = getopt_long (argc, argv, "Vvh?ecq:i:n:m:a:l:", long_options, &option_index);
+    c = getopt_long (argc, argv, "Vvh?cetq:i:n:m:a:l:", long_options, &option_index);
  
     /* Detect the end of the options. */
     if (c == -1)
@@ -124,6 +127,10 @@ int main(int argc, char *argv[]) {
         convert = 1;
         break;
 
+      case 't':
+        just_count = 1;
+        break;
+
       case 'q':
 		value = strtol(optarg,&end,0);
 		if (*end == 0 && errno == 0) {
@@ -150,7 +157,7 @@ int main(int argc, char *argv[]) {
 
       case 'V':
         /* version */
-        printf("Version is %s\n","version");
+        printf("Version is %s\n",PULLSEQ_VERSION);
         break;
 
       case 'h':
@@ -184,6 +191,8 @@ int main(int argc, char *argv[]) {
 			fprintf(stderr,"Only sequences greater than %i will be output\n", min);
 		if (length > 0)
 			fprintf(stderr,"Output will be %i columns long\n", length);
+		if (just_count > 0)
+			fprintf(stderr,"Output will be counted only\n");
 	}
  
   /* check validity of given argument set */
@@ -207,9 +216,9 @@ int main(int argc, char *argv[]) {
   }
 
   if (names) {
-    count = pull_by_name(in,names,min,max,length,exclude,convert);
+    count = pull_by_name(in,names,min,max,length,exclude,convert,just_count);
   } else {
-    count = pull_by_size(in,min,max,length,convert);
+    count = pull_by_size(in,min,max,length,convert,just_count);
   }
 
   free(in);

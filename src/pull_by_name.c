@@ -17,7 +17,7 @@ __KSEQ_READ
 extern char const *progname;
 extern int verbose_flag;
 
-int pull_by_name(char *input_file, char *names_file, int min, int max, int length, int exclude, int convert) {
+int pull_by_name(char *input_file, char *names_file, int min, int max, int length, int exclude, int convert, int just_count) {
 	FILE *names_fp;
 	gzFile fp;
 	int i,l,capacity=80;
@@ -87,31 +87,39 @@ int pull_by_name(char *input_file, char *names_file, int min, int max, int lengt
 				if (min > 0 && max > 0) { /* got a min and max */
 					if (seq->seq.l >= min && seq->seq.l <= max) {
 						count++;
-						if (convert)
-								is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
-						else 
-								is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
+						if (!just_count) {
+							if (convert)
+									is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
+							else 
+									is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
+						}
 					}
 				} else if (min > 0 || max > 0) { /* either  min or max is 0 */
 					if (min > 0 && seq->seq.l >= min) {
 						count++;
-						if (convert)
-								is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
-						else 
-								is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
+						if (!just_count) {
+							if (convert)
+									is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
+							else 
+									is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
+						}
 					} else if (max > 0 && seq->seq.l <= max) {
 						count++;
+						if (!just_count) {
+							if (convert)
+									is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
+							else 
+									is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
+						}
+					}
+				} else {
+					count++;
+					if (!just_count) {
 						if (convert)
 								is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
 						else 
 								is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
 					}
-				} else {
-					count++;
-					if (convert)
-							is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
-					else 
-							is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
 				}
 			}
 		} else { /* EXCLUDE names from names file */
@@ -121,31 +129,39 @@ int pull_by_name(char *input_file, char *names_file, int min, int max, int lengt
 				if (min > 0 && max > 0) { /* got a min and max */
 					if (seq->seq.l >= min && seq->seq.l <= max) {
 						count++;
-						if (convert)
-								is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
-						else 
-								is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
+						if (!just_count) {
+							if (convert)
+									is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
+							else 
+									is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
+						}
 					}
 				} else if (min > 0 || max > 0) { /* either  min or max is 0 */
 					if (min > 0 && seq->seq.l >= min) {
 						count++;
-						if (convert)
-								is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
-						else 
-								is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
+						if (!just_count) {
+							if (convert)
+									is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
+							else 
+									is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
+						}
 					} else if (max > 0 && seq->seq.l <= max) {
 						count++;
+						if (!just_count) {
+							if (convert)
+									is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
+							else 
+									is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
+						}
+					}
+				} else {
+					count++;
+					if (!just_count) {
 						if (convert)
 								is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
 						else 
 								is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
 					}
-				} else {
-					count++;
-					if (convert)
-							is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
-					else 
-							is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
 				}
 			}
 		}
@@ -155,7 +171,14 @@ int pull_by_name(char *input_file, char *names_file, int min, int max, int lengt
 
 	delete_hash(); /* free the list nodes */
 
+	if (just_count) {
+		fprintf(stdout, "Total output: %i\n", count);
+		if (exclude)
+			fprintf(stdout, "Total excluded: %i\n", excluded);
+	}
+
 	if (verbose_flag) {
+		fprintf(stderr,"Processed %i entries\n",count);
 		if (exclude)
 			fprintf(stderr,"Excluded %i entries\n",excluded);
 	}

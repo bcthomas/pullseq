@@ -1,6 +1,8 @@
 #ifndef GLOBAL_H
 #define GLOBAL_H
 
+#define PULLSEQ_VERSION "0.9.0"
+
 #define _POSIX_C_SOURCE 200809L
 /*
 #ifdef DEBUG

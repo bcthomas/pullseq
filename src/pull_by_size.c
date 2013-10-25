@@ -16,9 +16,10 @@ __KSEQ_READ
 extern char const *progname;
 extern int verbose_flag;
 
-int pull_by_size(char *input_file, int min, int max,int length, int convert) {
+int pull_by_size(char *input_file, int min, int max,int length, int convert, int just_count) {
 	gzFile fp;
 	int count=0,l;
+	int excluded = 0;
 	int is_fasta = 0; /* assume fastq */
 	kseq_t *seq;
 
@@ -49,35 +50,49 @@ int pull_by_size(char *input_file, int min, int max,int length, int convert) {
 		if (min > 0 && max > 0) { /* got a min and max */
 			if (l >= min && l <= max) {
 				count++;
-				if (convert)
-					is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
-				else
-					is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
-			}
+				if (!just_count) {
+					if (convert)
+						is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
+					else
+						is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
+				}
+			} else
+				++excluded;
 		} else if (min > 0 || max > 0) { /* either  min or max is 0 */
 			if (min > 0 && l >= min) {
 				count++;
-				if (convert)
-					is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
-				else
-					is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
+				if (!just_count) {
+					if (convert)
+						is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
+					else
+						is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
+				}
 			} else if (max > 0 && l <= max) {
 				count++;
+				if (!just_count) {
+					if (convert)
+						is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
+					else
+						is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
+				}
+			} else
+				++excluded;
+		} else {
+			count++;
+			if (!just_count) {
 				if (convert)
 					is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
 				else
 					is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
 			}
-		} else {
-			count++;
-			if (convert)
-				is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
-			else
-				is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
 		}
 	}
 	kseq_destroy(seq);
 	gzclose(fp); /* done reading file */
 
+	if (just_count) {
+		fprintf(stdout, "Total output: %i\n", count);
+		fprintf(stdout, "Total excluded: %i\n", excluded);
+	}
 	return count;
 }
