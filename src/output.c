@@ -25,9 +25,9 @@ void print_fastq_seq(kseq_t *seq)
 		free(qual_str);
 	} else {
 		if (seq->comment.s == NULL)
-			printf("@%s %s\n%s\n+\n%s\n",seq->name.s,seq->comment.s,seq->seq.s,seq->qual.s);
-		else
 			printf("@%s\n%s\n+\n%s\n",seq->name.s,seq->seq.s,seq->qual.s);
+		else
+			printf("@%s %s\n%s\n+\n%s\n",seq->name.s,seq->comment.s,seq->seq.s,seq->qual.s);
 	}
 }
 
