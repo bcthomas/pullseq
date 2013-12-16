@@ -17,8 +17,7 @@ __KSEQ_READ
 extern char const *progname;
 extern int verbose_flag;
 
-int pull_by_name(char *input_file, char *names_file, int min, int max, int length, int exclude, int convert, int just_count) {
-	FILE *names_fp;
+int pull_by_name(char *input_file, FILE *names_fp, int min, int max, int length, int exclude, int convert, int just_count) {
 	gzFile fp;
 	int i,l,capacity=80;
 	int count=0,excluded=0;
@@ -26,12 +25,6 @@ int pull_by_name(char *input_file, char *names_file, int min, int max, int lengt
 	char *fasta_name;
 	char *line;
 	kseq_t *seq;
-
-	names_fp = fopen(names_file,"r");
-	if (!names_fp) {
-		fprintf(stderr,"%s - failed to open file %s\n",progname,names_file);
-		exit(EXIT_FAILURE);
-	}
 
 	/* get some space for the line */
 	line = malloc(sizeof(char) * capacity); /* get memory allocated */
@@ -48,12 +41,10 @@ int pull_by_name(char *input_file, char *names_file, int min, int max, int lengt
 	}
 
 	free(line); /* free up line */
-	fclose(names_fp); /* close file */
 
 	if (verbose_flag) {
 		fprintf(stderr,"\n");
-		fprintf(stderr,"done reading from %s ",names_file);
-		fprintf(stderr, "(%d entries)\n", hash_key_count());
+		fprintf(stderr,"done reading from input (%d entries)\n", hash_key_count());
 	}
 	/*print_hash();*/
 
