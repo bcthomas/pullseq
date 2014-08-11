@@ -3,8 +3,9 @@
 #include <string.h>
 #include <zlib.h>
 #include <errno.h>
+#include <pcre.h>
 
-#include "pull_by_size.h"
+#include "pull_by_re.h"
 #include "file_read.h"
 #include "global.h"
 #include "size_filter.h"
@@ -17,10 +18,9 @@ __KSEQ_READ
 extern char const *progname;
 extern int verbose_flag;
 
-int pull_by_size(char *input_file, int min, int max,int length, int convert, int just_count) {
+int pull_by_re(char *input_file, pcre *re, pcre_extra *re_extra, int min, int max, int length, int exclude, int convert, int just_count) {
 	gzFile fp;
 	int count=0,l;
-	int hit = 0;
 	int excluded = 0;
 	int is_fasta = 0; /* assume fastq */
 	kseq_t *seq;
@@ -49,14 +49,23 @@ int pull_by_size(char *input_file, int min, int max,int length, int convert, int
 
 	/* search through list and see if this header matches */
 	while((l = kseq_read(seq)) >= 0) {
-		hit = size_filter(seq, is_fasta, min, max, length, convert, just_count);
-		if (hit)
-			count++;
-		else
-			excluded++;
-	}
+		if (exclude) {
+			if (search_header(re, re_extra, seq->name.s) || search_header(re, re_extra, seq->comment.s))
+				excluded++;
+			else {
+				/* regex doesn't match, so check size/print */
+				count += size_filter(seq, is_fasta, min, max, length, convert, just_count);
+			}
+		} else {
+			if (search_header(re, re_extra, seq->name.s) || search_header(re, re_extra, seq->comment.s)) {
+				/* regex matches so check size/print */
+				count += size_filter(seq, is_fasta, min, max, length, convert, just_count);
+			} else
+				excluded++;
+		}
+	} /* end of seq traversal */
 	kseq_destroy(seq);
-	gzclose(fp); /* done reading file */
+	gzclose(fp); /* done reading file so close */
 
 	if (just_count) {
 		fprintf(stdout, "Total output: %i\n", count);

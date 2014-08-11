@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([pullseq], [0.1], [bct.x42@gmail.com])
+AC_INIT([pullseq], [0.9.1], [bct.x42@gmail.com])
 #AC_CONFIG_AUX_DIR(config)
 AM_INIT_AUTOMAKE([foreign])
 AC_CONFIG_SRCDIR([src/pullseq.c])
@@ -13,9 +13,11 @@ AC_PROG_CC
 
 # Checks for libraries.
 AC_CHECK_LIB([z],[gzopen])
+AC_CHECK_LIB([pcre],[pcre_compile])
 
 # Checks for header files.
 AC_CHECK_HEADERS([inttypes.h limits.h stddef.h stdlib.h string.h])
+AC_CHECK_HEADERS([pcre.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_INLINE
@@ -29,8 +31,10 @@ AC_CHECK_TYPES([ptrdiff_t])
 # Checks for library functions.
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
-AC_CHECK_FUNCS([memset strchr strerror strtol])
+AC_CHECK_FUNCS([strlen memset strchr strerror strtol])
+
 
 AC_CONFIG_FILES([Makefile src/Makefile])
 
 AC_OUTPUT
+

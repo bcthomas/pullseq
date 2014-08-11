@@ -4,11 +4,11 @@
 #include <zlib.h>
 #include <errno.h>
 
+#include "global.h"
 #include "pull_by_name.h"
 #include "hash.h"
 #include "file_read.h"
-#include "global.h"
-#include "output.h"
+#include "size_filter.h"
 
 __KS_GETC(gzread, BUFFER_SIZE)
 __KS_GETUNTIL(gzread, BUFFER_SIZE)
@@ -74,87 +74,15 @@ int pull_by_name(char *input_file, FILE *names_fp, int min, int max, int length,
 	/* search through list and see if this header matches */
 	while((l = kseq_read(seq)) >= 0) {
 		if (exclude == 0) { /* INCLUDE names from names file */
-			if (find_name(seq->name.s)) {            /* found name in list */
-				if (min > 0 && max > 0) { /* got a min and max */
-					if (seq->seq.l >= min && seq->seq.l <= max) {
-						count++;
-						if (!just_count) {
-							if (convert)
-									is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
-							else 
-									is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
-						}
-					}
-				} else if (min > 0 || max > 0) { /* either  min or max is 0 */
-					if (min > 0 && seq->seq.l >= min) {
-						count++;
-						if (!just_count) {
-							if (convert)
-									is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
-							else 
-									is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
-						}
-					} else if (max > 0 && seq->seq.l <= max) {
-						count++;
-						if (!just_count) {
-							if (convert)
-									is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
-							else 
-									is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
-						}
-					}
-				} else {
-					count++;
-					if (!just_count) {
-						if (convert)
-								is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
-						else 
-								is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
-					}
-				}
-			}
-		} else { /* EXCLUDE names from names file */
-			if (find_name(seq->name.s)) {            /* found name in list */
+			if (find_name(seq->name.s))            /* found name in list */
+				count += size_filter(seq, is_fasta, min, max, length, convert, just_count);
+			else
 				excluded++;
-			} else {
-				if (min > 0 && max > 0) { /* got a min and max */
-					if (seq->seq.l >= min && seq->seq.l <= max) {
-						count++;
-						if (!just_count) {
-							if (convert)
-									is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
-							else 
-									is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
-						}
-					}
-				} else if (min > 0 || max > 0) { /* either  min or max is 0 */
-					if (min > 0 && seq->seq.l >= min) {
-						count++;
-						if (!just_count) {
-							if (convert)
-									is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
-							else 
-									is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
-						}
-					} else if (max > 0 && seq->seq.l <= max) {
-						count++;
-						if (!just_count) {
-							if (convert)
-									is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
-							else 
-									is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
-						}
-					}
-				} else {
-					count++;
-					if (!just_count) {
-						if (convert)
-								is_fasta ? print_fastq_seq(seq) : print_fasta_seq(seq,length);
-						else 
-								is_fasta ? print_fasta_seq(seq,length) : print_fastq_seq(seq);
-					}
-				}
-			}
+		} else { /* EXCLUDE names from names file */
+			if (find_name(seq->name.s))            /* found name in list */
+				excluded++;
+			else
+				count += size_filter(seq, is_fasta, min, max, length, convert, just_count);
 		}
 	}
 	kseq_destroy(seq);
