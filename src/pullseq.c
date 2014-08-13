@@ -17,21 +17,21 @@ extern int verbose_flag;
 
 void show_usage(int status) {
 	fprintf(stderr, "pullseq - a bioinformatics tool for manipulating fasta and fastq files\n");
-	fprintf(stderr, "\nVersion: %s              Search method: %s",PULLSEQ_VERSION,PULLSEQ_SORTMETHOD);
+	fprintf(stderr, "\nVersion: %s              Name lookup method: %s", PULLSEQ_VERSION, PULLSEQ_SORTMETHOD);
 	fprintf(stderr, "\n(Written by bct - 2014; copyright 2012-2014)\n");
 	fprintf(stderr, "\nUsage:\n");
-	fprintf(stderr, " %s -i <input fasta/fastq file> -n <header names to select>\n\n",progname);
-	fprintf(stderr, " %s -i <input fasta/fastq file> -m <minimum sequence length>\n\n",progname);
-	fprintf(stderr, " %s -i <input fasta/fastq file> -r <regex name to match>\n\n",progname);
-	fprintf(stderr, " %s -i <input fasta/fastq file> -m <minimum sequence length> -a <max sequence length>\n\n",progname);
-	fprintf(stderr, " %s -i <input fasta/fastq file> -t\n\n",progname);
-	fprintf(stderr, " cat <names to select from STDIN> | %s -i <input fasta/fastq file> -N\n\n",progname);
+	fprintf(stderr, " %s -i <input fasta/fastq file> -n <header names to select>\n\n", progname);
+	fprintf(stderr, " %s -i <input fasta/fastq file> -m <minimum sequence length>\n\n", progname);
+	fprintf(stderr, " %s -i <input fasta/fastq file> -r <regex name to match>\n\n", progname);
+	fprintf(stderr, " %s -i <input fasta/fastq file> -m <minimum sequence length> -a <max sequence length>\n\n", progname);
+	fprintf(stderr, " %s -i <input fasta/fastq file> -t\n\n", progname);
+	fprintf(stderr, " cat <names to select from STDIN> | %s -i <input fasta/fastq file> -N\n\n", progname);
 
 	fprintf(stderr, "  Options:\n");
 	fprintf(stderr, "    -i, --input,       Input fasta/fastq file (required)\n");
 	fprintf(stderr, "    -n, --names,       File of header id names to search for\n");
 	fprintf(stderr, "    -N, --names_stdin, Use STDIN for header id names\n");
-	fprintf(stderr, "    -r, --re,          Regular expression to match (PERL compatible)\n");
+	fprintf(stderr, "    -r, --re,          Regular expression to match (PERL compatible; always case-insensitive)\n");
 	fprintf(stderr, "    -m, --min,         Minimum sequence length\n");
 	fprintf(stderr, "    -a, --max,         Maximum sequence length\n");
 	fprintf(stderr, "    -l, --length,      Sequence characters per line (default 50)\n");
@@ -132,7 +132,7 @@ int main(int argc, char *argv[]) {
 				if (*end == '\0' && errno == 0) {
 					min = atoi(optarg);
 				} else {
-					fprintf(stderr, "Maximum value (-m) argument '%s' is not an integer\n",optarg);
+					fprintf(stderr, "Maximum value (-m) argument '%s' is not an integer\n", optarg);
 					return EXIT_FAILURE;
 				}
 				break;
@@ -142,7 +142,7 @@ int main(int argc, char *argv[]) {
 				if (*end == '\0' && errno == 0) {
 					max = atoi(optarg);
 				} else {
-					fprintf(stderr, "Maximum value (-a) argument '%s' is not an integer\n",optarg);
+					fprintf(stderr, "Maximum value (-a) argument '%s' is not an integer\n", optarg);
 					return EXIT_FAILURE;
 				}
 				break;
@@ -171,18 +171,18 @@ int main(int argc, char *argv[]) {
 				break;
 
 			case 'l':
-				value = strtol(optarg,&end,0);
+				value = strtol(optarg, &end,0);
 				if (*end == '\0' && errno == 0) {
 					length = atoi(optarg);
 				} else {
-					fprintf(stderr, "Sequence length value (-l) argument '%s' is not an integer\n",optarg);
+					fprintf(stderr, "Sequence length value (-l) argument '%s' is not an integer\n", optarg);
 					return EXIT_FAILURE;
 				}
 				break;
 
 			case 'V':
 				/* version */
-				printf("Version is %s\n",PULLSEQ_VERSION);
+				printf("Version is %s\n", PULLSEQ_VERSION);
 				break;
 
 			case 'h':
@@ -269,7 +269,7 @@ int main(int argc, char *argv[]) {
 	if (aStrRegex) {
 		// First, the regex string must be compiled. Support extended
 		// regex strings (e.g. m//x)
-		reCompiled = pcre_compile(aStrRegex, PCRE_EXTENDED, &pcreErrorStr, &pcreErrorOffset, NULL);
+		reCompiled = pcre_compile(aStrRegex, PCRE_EXTENDED|PCRE_CASELESS, &pcreErrorStr, &pcreErrorOffset, NULL);
 
 		if (reCompiled == NULL) {
 			fprintf(stderr, "ERROR: Could not compile '%s': %s\n", aStrRegex, pcreErrorStr);
