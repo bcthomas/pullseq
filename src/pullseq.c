@@ -22,7 +22,7 @@ void show_usage(int status) {
 	fprintf(stderr, "\nUsage:\n");
 	fprintf(stderr, " %s -i <input fasta/fastq file> -n <header names to select>\n\n", progname);
 	fprintf(stderr, " %s -i <input fasta/fastq file> -m <minimum sequence length>\n\n", progname);
-	fprintf(stderr, " %s -i <input fasta/fastq file> -r <regex name to match>\n\n", progname);
+	fprintf(stderr, " %s -i <input fasta/fastq file> -g <regex name to match>\n\n", progname);
 	fprintf(stderr, " %s -i <input fasta/fastq file> -m <minimum sequence length> -a <max sequence length>\n\n", progname);
 	fprintf(stderr, " %s -i <input fasta/fastq file> -t\n\n", progname);
 	fprintf(stderr, " cat <names to select from STDIN> | %s -i <input fasta/fastq file> -N\n\n", progname);
@@ -31,7 +31,7 @@ void show_usage(int status) {
 	fprintf(stderr, "    -i, --input,       Input fasta/fastq file (required)\n");
 	fprintf(stderr, "    -n, --names,       File of header id names to search for\n");
 	fprintf(stderr, "    -N, --names_stdin, Use STDIN for header id names\n");
-	fprintf(stderr, "    -r, --re,          Regular expression to match (PERL compatible; always case-insensitive)\n");
+	fprintf(stderr, "    -g, --regex,       Regular expression to match (PERL compatible; always case-insensitive)\n");
 	fprintf(stderr, "    -m, --min,         Minimum sequence length\n");
 	fprintf(stderr, "    -a, --max,         Maximum sequence length\n");
 	fprintf(stderr, "    -l, --length,      Sequence characters per line (default 50)\n");
@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
 			{"version",     no_argument,       0, 'V'},
 			{"help",        no_argument,       0, 'h'},
 			{"input",       required_argument, 0, 'i'},
-			{"re",          required_argument, 0, 'r'},
+			{"regex",       required_argument, 0, 'g'},
 			{"names",       required_argument, 0, 'n'},
 			{"names_stdin", no_argument,       0, 'N'},
 			{"min",         required_argument, 0, 'm'},
@@ -97,7 +97,7 @@ int main(int argc, char *argv[]) {
 		/* getopt_long stores the option index here. */
 		int option_index = 0;
 
-		c = getopt_long (argc, argv, "Vvh?cetq:i:r:Nn:m:a:l:", long_options, &option_index);
+		c = getopt_long (argc, argv, "Vvh?cetq:i:g:Nn:m:a:l:", long_options, &option_index);
 
 		/* Detect the end of the options. */
 		if (c == -1)
@@ -113,7 +113,7 @@ int main(int argc, char *argv[]) {
 				strcpy(in,optarg);
 				break;
 
-			case 'r':
+			case 'g':
 				aStrRegex = (char*) malloc(strlen(optarg)+1);
 				strcpy(aStrRegex, optarg);
 				break;
@@ -269,7 +269,7 @@ int main(int argc, char *argv[]) {
 	if (aStrRegex) {
 		// First, the regex string must be compiled. Support extended
 		// regex strings (e.g. m//x)
-		reCompiled = pcre_compile(aStrRegex, PCRE_EXTENDED|PCRE_CASELESS, &pcreErrorStr, &pcreErrorOffset, NULL);
+		reCompiled = pcre_compile(aStrRegex, PCRE_CASELESS, &pcreErrorStr, &pcreErrorOffset, NULL);
 
 		if (reCompiled == NULL) {
 			fprintf(stderr, "ERROR: Could not compile '%s': %s\n", aStrRegex, pcreErrorStr);
