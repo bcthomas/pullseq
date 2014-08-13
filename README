@@ -4,8 +4,10 @@ Pullseq Summary:
   pullseq - extract sequences from a fasta/fastq file.  This program is
   fast, and can be useful in a variety of situations.  You can use it to
   extract sequences from one fasta/fastq file into a new file, given
-  either a list of header ids to include / exclude or a size minimum /
-  maximum sequence lengths.
+  either a list of header ids to include or a regular expression
+  pattern to match.  Results can be included (default) or excluded,
+  and they can additionally be filtered with minimum / maximum sequence
+  lengths.
 
   Additionally, it can convert from fastq to fasta or visa-versa and
   can change the length of the output sequence lines.
@@ -14,29 +16,36 @@ Pullseq Summary:
   (e.g. pullseq input.fasta -m 10 *>* output.fasta ) to create output files.
 
 Synopsis:
-  # general extraction with a list of names
-  pullseq --input=<input fasta/fastq file> --names=<fasta header ids file>
-  
-  # general extraction with a minimum size requirement
-  pullseq --input=<input fasta/fastq file> --min=<minimum size sequence to extract>
-  
-  # only sequences with min 200 and max 500
-  pullseq -i input.fasta -m 200 -a 500 > new.fasta
+
+ pullseq -i <input fasta/fastq file> -n <header names to select>
+
+ pullseq -i <input fasta/fastq file> -m <minimum sequence length>
+
+ pullseq -i <input fasta/fastq file> -g <regex name to match>
+
+ pullseq -i <input fasta/fastq file> -m <minimum sequence length> -a <max sequence length>
+
+ pullseq -i <input fasta/fastq file> -t
+
+ cat <names to select from STDIN> | pullseq -i <input fasta/fastq file> -N
 
   Options:
-    -i, --input,     Input fasta/fastq file (required)
-    -n, --names,     File of header id names to select
-    -m, --min,       Minimum sequence length
-    -a, --max,       Maximum sequence length
-    -l, --length,    Sequence characters per line (default 50)
-    -c, --convert,   Convert input to fastq/fasta (e.g. if input is fastq, output will be fasta)
-    -q, --quality,   ASCII code to use for fasta->fastq quality conversions
-    -e, --excluded,  Exclude the header id names in the list (-n)
-    -t, --count,     Just count the possible output, but don't write it
-    -h, --help,      Display this help and exit
-    -v, --verbose,   Print extra details during the run
-    --version,       Output version information and exit
+    -i, --input,       Input fasta/fastq file (required)
+    -n, --names,       File of header id names to search for
+    -N, --names_stdin, Use STDIN for header id names
+    -g, --regex,       Regular expression to match (PERL compatible; always case-insensitive)
+    -m, --min,         Minimum sequence length
+    -a, --max,         Maximum sequence length
+    -l, --length,      Sequence characters per line (default 50)
+    -c, --convert,     Convert input to fastq/fasta (e.g. if input is fastq, output will be fasta)
+    -q, --quality,     ASCII code to use for fasta->fastq quality conversions
+    -e, --excluded,    Exclude the header id names in the list (-n)
+    -t, --count,       Just count the possible output, but don't write it
+    -h, --help,        Display this help and exit
+    -v, --verbose,     Print extra details during the run
+    --version,         Output version information and exit
 
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
 
 Seqdiff Summary:
   seqdiff - compare two fasta (or fastq) files to determine overlap of
