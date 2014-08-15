@@ -1,5 +1,4 @@
 #include <stdio.h>
-/* #include <stdlib.h> */
 #include <string.h>
 #include <pcre.h>
 
@@ -11,6 +10,9 @@ int search_header(pcre *re, pcre_extra *re_extra, char *str) {
 	int pcreExecRet;
 	int pcre_ovector[MAX_CAPTURE_COUNT];
 
+	if (str == NULL) {
+		return 0;
+	}
 
 	pcreExecRet = pcre_exec(re, re_extra,
 			str, 
