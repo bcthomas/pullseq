@@ -21,7 +21,7 @@
 __KS_TYPE(gzFile)
 __KS_BASIC(gzFile, BUFFER_SIZE)
 __KSEQ_TYPE(gzFile)
-__KSEQ_BASIC(gzFile)
+__KSEQ_BASIC(static, gzFile)
 
 char const *progname;
 int QUALITY_SCORE;

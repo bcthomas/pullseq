@@ -20,14 +20,14 @@ void print_fastq_seq(kseq_t *seq)
 		}
 		qual_str[l - 1] = '\0'; /* terminate the string */
 
-		if (seq->comment.s == NULL)
+		if (seq->comment.l == 0)
 			printf("@%s\n%s\n+\n%s\n", seq->name.s, seq->seq.s, qual_str);
 		else
 			printf("@%s %s\n%s\n+\n%s\n", seq->name.s, seq->comment.s, seq->seq.s, qual_str);
 
 		free(qual_str);
 	} else {
-		if (seq->comment.s == NULL)
+		if (seq->comment.l == 0)
 			printf("@%s\n%s\n+\n%s\n",seq->name.s,seq->seq.s,seq->qual.s);
 		else
 			printf("@%s %s\n%s\n+\n%s\n",seq->name.s,seq->comment.s,seq->seq.s,seq->qual.s);
@@ -52,7 +52,10 @@ void print_fasta_seq(kseq_t *seq, int n)
 		if (seq->comment.s == NULL) {
 			printf(">%s\n",seq->name.s);
 		} else {
-			printf(">%s %s\n",seq->name.s,seq->comment.s);
+			if (seq->comment.l == 0)
+				printf(">%s\n",seq->name.s);
+			else
+				printf(">%s %s\n",seq->name.s, seq->comment.s);
 		}
 
 		for (x=0; x<l;x++) {
@@ -73,7 +76,7 @@ void print_fasta_seq(kseq_t *seq, int n)
 		if (strlen(seqbuf) > 0)
 			printf("%s\n",seqbuf);
 	} else {                     /* seqlength < column length, so just print the full sequence */
-		if (seq->comment.s == NULL)
+		if (seq->comment.l == 0)
 			printf(">%s\n%s\n",seq->name.s,seq->seq.s);
 		else
 			printf(">%s %s\n%s\n",seq->name.s,seq->comment.s,seq->seq.s);
@@ -81,26 +84,25 @@ void print_fasta_seq(kseq_t *seq, int n)
 	free(seqbuf);
 }
 
-void print_fasta(FILE *fp, char *name, char *comment, char *seq)
+void print_fasta(FILE *fp, char *name, char *comment, char *seq, size_t colwidth)
 {
 	int l = strlen(seq);   /* sequence length */
 	int x,i=0;
-	int n = 50;
 	char *seqbuf = NULL;
-	seqbuf = (char *)malloc(sizeof(char) * (n + 1));
+	seqbuf = (char *)malloc(sizeof(char) * (colwidth + 1));
 	if (seqbuf == NULL) {
 		fprintf(stderr,"print_seq: out of memory for seqbuf!\n");
 		exit(EXIT_FAILURE);
 	}
 
-	if (l > n) {                  /* seqlength is > column length - split sequence */
+	if (l > colwidth) {                  /* seqlength is > column length - split sequence */
 		if (comment == NULL)
 			fprintf(fp, ">%s\n",name);
 		else
 			fprintf(fp, ">%s %s\n",name,comment);
 
 		for (x=0; x<l;x++) {
-			if (i < n) {                     /* there's less sequence than the column width */
+			if (i < colwidth) {                     /* there's less sequence than the column width */
 				seqbuf[i] = seq[x];
 				i++;
 			} else {                         /* i is >= column width, so print this line */
@@ -112,7 +114,7 @@ void print_fasta(FILE *fp, char *name, char *comment, char *seq)
 				i++;
 			}
 		}
-		if (i<n)
+		if (i<colwidth)
 			seqbuf[i] = '\0';
 		if (strlen(seqbuf) > 0)
 			fprintf(fp, "%s\n",seqbuf);

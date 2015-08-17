@@ -14,6 +14,8 @@ test/big_test.fastq
 test/big_test.txt
 .deps
 Makefile
+valgrind_ex.sh
+real_test.sh
 Makefile.in
 aclocal.m4
 *.log
@@ -26,3 +28,17 @@ config.*
 /depcomp
 /install-sh
 /missing
+test/RifleCSP2_O2Inj_2_contigs.fa
+test/RifleCSP2_O2Inj_2_feature_locations.txt
+test/all_contigs_01142015.fa
+test/all_contigs_01142015.fa.summary.txt
+test/bct_feature_locations_01142015.txt
+test/rpL6_bact_arch_euk_curated.fasta
+test/list
+test/listlist2
+test/test.txt.2
+test/test_gene.fna
+test/test_locations.txt
+test/test_locations_gene.txt
+test/test_locations_noname.txt
+test/test_noname.fa

@@ -6,5 +6,5 @@
 
 void print_fasta_seq(kseq_t *seq,int n);
 void print_fastq_seq(kseq_t *seq);
-void print_fasta(FILE *fp,char *name, char *comment, char *seq);
+void print_fasta(FILE *fp,char *name, char *comment, char *seq, size_t colwidth);
 #endif

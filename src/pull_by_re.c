@@ -13,7 +13,7 @@
 
 __KS_GETC(gzread, BUFFER_SIZE)
 __KS_GETUNTIL(gzread, BUFFER_SIZE)
-__KSEQ_READ
+__KSEQ_READ(static)
 
 extern char const *progname;
 extern int verbose_flag;

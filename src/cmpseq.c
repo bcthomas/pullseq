@@ -11,7 +11,7 @@
 
 __KS_GETC(gzread, BUFFER_SIZE)
 __KS_GETUNTIL(gzread, BUFFER_SIZE)
-__KSEQ_READ
+__KSEQ_READ(static)
 
 sd_lookup_t *sd_lookup = NULL;
 
@@ -69,19 +69,19 @@ void cmpseq(seqdiff_results_t *results) {
 				fprintf(stdout,"%s\t\n",s->name);
 			/* printing out fasta or fastq????? */
 			if (results->a_output_fp != NULL)
-				print_fasta(results->a_output_fp, s->name, s->comment, s->seq);
+				print_fasta(results->a_output_fp, s->name, s->comment, s->seq, 50);
 		} else if (s->in_a == 0 && s->in_b == 1) {
 			results->second_file_uniq++;
 			if (!results->only_summarize)
 				fprintf(stdout,"\t%s\n",s->name);
 			if (results->b_output_fp != NULL)
-				print_fasta(results->b_output_fp, s->name, s->comment, s->seq);
+				print_fasta(results->b_output_fp, s->name, s->comment, s->seq, 50);
 		} else if (s->in_a == 1 && s->in_b == 1) {
 			results->common++;
 			if (!results->only_summarize)
 				fprintf(stdout,"%s\t%s\n",s->name,s->name);
 			if (results->c_output_fp != NULL) {
-				print_fasta(results->c_output_fp, s->name, s->comment, s->seq);
+				print_fasta(results->c_output_fp, s->name, s->comment, s->seq, 50);
 			}
 		}
 	}

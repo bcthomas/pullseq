@@ -12,7 +12,7 @@
 
 __KS_GETC(gzread, BUFFER_SIZE)
 __KS_GETUNTIL(gzread, BUFFER_SIZE)
-__KSEQ_READ
+__KSEQ_READ(static)
 
 extern char const *progname;
 extern int verbose_flag;
@@ -33,7 +33,7 @@ int pull_by_name(char *input_file, FILE *names_fp, int min, int max, int length,
 		exit(EXIT_FAILURE);
 	}
 
-	while((i = getl(&line,names_fp)) != -1) {
+	while((i = getl(&line, names_fp)) != -1) {
 		fasta_name = parse_name(line);
 		if (fasta_name) {
 			add_name(fasta_name);             /* add fasta_name to hash */
