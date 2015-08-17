@@ -314,6 +314,9 @@ int main(int argc, char *argv[]) {
 	if (names)
 		free(names);
 
+	if (names_fp)
+		fclose(names_fp);
+
 	if (aStrRegex) {
 		free(aStrRegex);
 		// Free up the regular expression.
