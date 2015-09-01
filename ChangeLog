@@ -1,10 +1,86 @@
+2015-08-17 12:40:39 -0700 Brian C. Thomas 
+
+	* Merge branch 'master' of github.com:bcthomas/pullseq (HEAD -> master, origin/master)
+
+2015-08-17 12:36:36 -0700 Brian C. Thomas 
+
+	* fixed fasta comment bug
+
+2015-01-08 08:29:58 -0800 Brian C. Thomas 
+
+	* closed names_fp file pointer
+
+2014-09-17 12:04:28 -0700 Brian C. Thomas 
+
+	* update uthash to 1.9.9.1
+
+2014-08-15 16:57:44 -0700 Brian C. Thomas 
+
+	* update to 1.0.1
+
+2014-08-15 16:56:54 -0700 Brian C. Thomas 
+
+	* fixed bug in search_header()
+
+2014-08-13 10:15:05 -0700 Brian C. Thomas 
+
+	* updated README
+
+2014-08-13 09:17:09 -0700 Brian C. Thomas 
+
+	* changed param name to "regex" and short to "-g"
+
+2014-08-13 09:01:04 -0700 Brian C. Thomas 
+
+	* updated regex matching to be case-insensitive
+
+2014-08-11 12:05:27 -0700 Brian C. Thomas 
+
+	* Regex searching and some refactoring
+
+2014-07-16 09:18:12 -0700 Brian C. Thomas 
+
+	* allow '>' or '@' in the names files
+
+2013-12-16 08:42:23 -0800 Brian C. Thomas 
+
+	* added ability to get names from STDIN
+
+2013-12-13 07:21:01 -0800 Brian C. Thomas 
+
+	* fixed but in FASTQ header output
+
+2013-10-25 11:59:14 -0700 Brian C. Thomas 
+
+	* typo
+
+2013-10-25 11:57:50 -0700 Brian C. Thomas 
+
+	* updated README
+
+2013-10-25 11:55:08 -0700 Brian C. Thomas 
+
+	* added sequence counting, version, help
+
+2013-03-13 13:39:00 -0700 Brian C. Thomas 
+
+	* Merge branch 'seqdiff'
+
+2013-03-13 13:37:59 -0700 Brian C. Thomas 
+
+	* updated docs
+
 2013-03-13 13:26:11 -0700 Brian C. Thomas 
 
-	* finished seqdiff (HEAD, seqdiff)
+	* finished seqdiff
 
 2013-03-09 14:25:41 -0800 Brian C. Thomas 
 
 	* Completed cmpseq()
+
+2013-02-28 09:44:44 -0800 Brian C. Thomas 
+
+	* updated license to be accurate
 
 2013-02-28 09:44:44 -0800 Brian C. Thomas 
 

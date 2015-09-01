@@ -18,7 +18,7 @@ extern int verbose_flag;
 void show_usage(int status) {
 	fprintf(stderr, "pullseq - a bioinformatics tool for manipulating fasta and fastq files\n");
 	fprintf(stderr, "\nVersion: %s              Name lookup method: %s", PULLSEQ_VERSION, PULLSEQ_SORTMETHOD);
-	fprintf(stderr, "\n(Written by bct - 2014; copyright 2012-2014)\n");
+	fprintf(stderr, "\n(Written by bct - copyright 2012-2015)\n");
 	fprintf(stderr, "\nUsage:\n");
 	fprintf(stderr, " %s -i <input fasta/fastq file> -n <header names to select>\n\n", progname);
 	fprintf(stderr, " %s -i <input fasta/fastq file> -m <minimum sequence length>\n\n", progname);

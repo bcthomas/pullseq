@@ -93,9 +93,10 @@ INSTALL:
   make         # will build the application
   make install # will install in /usr/local by default
 
-  From a Tar file:
+  From a Release file (tar or zip):
   tar xvf pullseq_version.tar.gz
   cd pullseq_version
+  ./autoconf   # make sure configuration is set
   ./configure  # configure the application based on your system
   make         # will build the application
   make install # will install in /usr/local by default
