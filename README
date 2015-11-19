@@ -1,6 +1,12 @@
-This software includes two applications: pullseq and seqdiff.
+Summary:
+
+Software to extract sequence from a fasta or fastq. Also filter
+sequences by a minimum length or maximum length. Fast, written in C,
+using kseq.h library.
+
 
 Pullseq Summary:
+
   pullseq - extract sequences from a fasta/fastq file.  This program is
   fast, and can be useful in a variety of situations.  You can use it to
   extract sequences from one fasta/fastq file into a new file, given
