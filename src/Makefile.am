@@ -3,7 +3,8 @@ pullseq_SOURCES = global.h global.h  uthash.h hash.c hash.h kseq.h output.c outp
 									size_filter.c size_filter.h search_header.c search_header.h \
 									file_read.c file_read.h \
 									pull_by_re.c pull_by_re.h pull_by_name.c pull_by_name.h \
-									pull_by_size.c pull_by_size.h pullseq.c pullseq.h
+									pull_by_size.c pull_by_size.h pullseq.c pullseq.h \
+									fmemopen.c fmemopen.h
 									
 #pullseq_LDADD = @ZLIB@
 
