@@ -11,6 +11,7 @@
 #include "pull_by_name.h"
 #include "pull_by_size.h"
 #include "pull_by_re.h"
+#include "fmemopen.h"
 
 extern int QUALITY_SCORE;
 extern int verbose_flag;
@@ -25,12 +26,14 @@ void show_usage(int status) {
 	fprintf(stderr, " %s -i <input fasta/fastq file> -g <regex name to match>\n\n", progname);
 	fprintf(stderr, " %s -i <input fasta/fastq file> -m <minimum sequence length> -a <max sequence length>\n\n", progname);
 	fprintf(stderr, " %s -i <input fasta/fastq file> -t\n\n", progname);
+	fprintf(stderr, " %s -i <input fasta/fastq file> -s <scaffold/header name to select>\n\n", progname);
 	fprintf(stderr, " cat <names to select from STDIN> | %s -i <input fasta/fastq file> -N\n\n", progname);
 
 	fprintf(stderr, "  Options:\n");
 	fprintf(stderr, "    -i, --input,       Input fasta/fastq file (required)\n");
 	fprintf(stderr, "    -n, --names,       File of header id names to search for\n");
 	fprintf(stderr, "    -N, --names_stdin, Use STDIN for header id names\n");
+	fprintf(stderr, "    -s, --scaffold,    Scaffold/header name to select\n");
 	fprintf(stderr, "    -g, --regex,       Regular expression to match (PERL compatible; always case-insensitive)\n");
 	fprintf(stderr, "    -m, --min,         Minimum sequence length\n");
 	fprintf(stderr, "    -a, --max,         Maximum sequence length\n");
@@ -48,10 +51,11 @@ void show_usage(int status) {
 
 int main(int argc, char *argv[]) {
 	int c;
-	char *in = NULL,*names = NULL;
+	char *in = NULL, *names = NULL, *scaffold = NULL;
 	FILE *names_fp = NULL;
 	int min = -1, max = -1;
 	int names_from_stdin = 0;
+	int single_name = 0;
 	int exclude = 0;
 	int count = 0;
 	int just_count = 0; /* flag for just counting the output */
@@ -87,6 +91,7 @@ int main(int argc, char *argv[]) {
 			{"regex",       required_argument, 0, 'g'},
 			{"names",       required_argument, 0, 'n'},
 			{"names_stdin", no_argument,       0, 'N'},
+			{"scaffold",    required_argument, 0, 's'},
 			{"min",         required_argument, 0, 'm'},
 			{"max",         required_argument, 0, 'a'},
 			{"length",      required_argument, 0, 'l'},
@@ -97,7 +102,7 @@ int main(int argc, char *argv[]) {
 		/* getopt_long stores the option index here. */
 		int option_index = 0;
 
-		c = getopt_long (argc, argv, "Vvh?cetq:i:g:Nn:m:a:l:", long_options, &option_index);
+		c = getopt_long (argc, argv, "Vvh?cetq:i:g:Nn:s:m:a:l:", long_options, &option_index);
 
 		/* Detect the end of the options. */
 		if (c == -1)
@@ -125,6 +130,12 @@ int main(int argc, char *argv[]) {
 
 			case 'N':
 				names_from_stdin = 1;
+				break;
+			
+			case 's':
+				single_name = 1;
+				scaffold = (char*) malloc(strlen(optarg)+1);
+				strcpy(scaffold, optarg);
 				break;
 
 			case 'm':
@@ -217,12 +228,18 @@ int main(int argc, char *argv[]) {
 				fprintf(stderr,"Names in %s will be excluded\n", names);
 			else
 				fprintf(stderr,"Names in %s will be included\n", names);
+		} else if (scaffold != NULL) {
+			if (exclude)
+				fprintf(stderr,"Names matching %s will be excluded\n", scaffold);
+			else
+				fprintf(stderr,"Names matching %s will be included\n", scaffold);
 		}
-		if (aStrRegex)
+		if (aStrRegex) {
 			if (exclude)
 				fprintf(stderr,"Only sequences not matching %s will be output\n", aStrRegex);
 			else
 				fprintf(stderr,"Only sequences matching %s will be output\n", aStrRegex);
+		}
 		if (max > 0)
 			fprintf(stderr,"Only sequences less than %i will be output\n", max);
 		if (min > 0)
@@ -246,14 +263,14 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	if (names && names_from_stdin) {
-		fprintf (stderr, "Error: Cannot use names from STDIN *and* names from a file.\n");
+	if ((names && names_from_stdin) || (names && single_name) || (names_from_stdin && single_name)) {
+		fprintf (stderr, "Error: Cannot use multiple criteria for matching. Try: -n, -N, OR -s\n");
 		return EXIT_FAILURE;
 	}
 
 	if (aStrRegex) {
-		if (names || names_from_stdin) {
-			fprintf (stderr, "Error: You can't use a names file or names from STDIN and a regex match.\n");
+		if (names || names_from_stdin || single_name) {
+			fprintf (stderr, "Error: You can't use a names file, names from STDIN, or single name and a regex match.\n");
 			return EXIT_FAILURE;
 		}
 	}
@@ -291,16 +308,20 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	if (names || names_from_stdin) {
+	if (names || names_from_stdin || single_name) {
 		if (names) {
 			names_fp = fopen(names,"r");
 			if (!names_fp) {
 				fprintf(stderr,"%s - failed to open names file %s\n",progname, names);
 				exit(EXIT_FAILURE);
 			}
-		} else {
+		} else if (names_from_stdin) {
 			names_fp = stdin;
+		} else {
+			/* matches set as read buffer from string */
+			names_fp = fmemopen(scaffold, strlen(scaffold), "r");
 		}
+
 		count = pull_by_name(in, names_fp, min, max, length, exclude, convert, just_count);
 	} else if (reCompiled) {
 		count = pull_by_re(in, reCompiled, pcreExtra, min, max, length, exclude, convert, just_count);
