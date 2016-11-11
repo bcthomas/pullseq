@@ -13,11 +13,25 @@ AC_PROG_CC
 
 # Checks for libraries.
 AC_CHECK_LIB([z],[gzopen])
-AC_CHECK_LIB([pcre],[pcre_compile])
+AC_CHECK_LIB([pcre],[pcre_compile], [], [
+              echo "  Error! You need to have libpcre installed."
+              echo "  If you have PCRE installed in a non-standard"
+              echo "  location (e.g. as with brew on a mac), you'll"
+              echo "  need to update the CFLAGS/LDFLAGS env"
+              echo "  variables. See the README for more details."
+              exit -1
+              ])
 
 # Checks for header files.
 AC_CHECK_HEADERS([inttypes.h limits.h stddef.h stdlib.h string.h])
-AC_CHECK_HEADERS([pcre.h])
+AC_CHECK_HEADERS([pcre.h], [], [
+                  echo "  Error! You need to have libpcre installed."
+                  echo "  If you have PCRE installed in a non-standard"
+                  echo "  location (e.g. as with brew on a mac), you'll"
+                  echo "  need to update the CFLAGS/LDFLAGS env"
+                  echo "  variables. See the README for more details."
+                  exit -1
+                 ])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_C_INLINE

@@ -106,3 +106,23 @@ INSTALL:
   ./configure  # configure the application based on your system
   make         # will build the application
   make install # will install in /usr/local by default
+
+  NOTE: If you have PCRE (perl-compatible regular expression library)
+  installed in a non-standard location (e.g. on a mac using brew), the
+  ./configure script will fail. You'll need to update your CFLAGS and
+  LDFLAGS env settings to define where your PCRE library files were
+  installed.
+
+  For example, on a mac with pcre installed by brew, you can do this:
+
+  pcre-config --cflags
+  -I/usr/local/Cellar/pcre/8.39/include
+  
+  Then you can just add this to a env CFLAGS variable and run the
+  configure command, like so...
+
+  export CFLAGS="-I/usr/local/Cellar/pcre/8.39/include"
+  ./configure
+
+  If your pcre library is installed somewhere else, you just update
+  the CFLAGS env variable accordingly.
