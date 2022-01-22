@@ -4,7 +4,6 @@
 #include <zlib.h>
 #include <errno.h>
 #include <getopt.h>
-#include <pcre.h>
 
 #include "global.h"
 #include "pullseq.h"
@@ -59,10 +58,6 @@ int main(int argc, char *argv[]) {
 	int length = 50;
 	long value;
 	char *end;
-	pcre *reCompiled = NULL;
-	pcre_extra *pcreExtra;
-	const char *pcreErrorStr;
-	int pcreErrorOffset;
 	char *aStrRegex = NULL;
 
 	extern char *optarg; /* external from getopt */
@@ -265,32 +260,6 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	/* if a regex search was requested, set up the pcre engine */
-	if (aStrRegex) {
-		// First, the regex string must be compiled. Support extended
-		// regex strings (e.g. m//x)
-		reCompiled = pcre_compile(aStrRegex, PCRE_CASELESS, &pcreErrorStr, &pcreErrorOffset, NULL);
-
-		if (reCompiled == NULL) {
-			fprintf(stderr, "ERROR: Could not compile '%s': %s\n", aStrRegex, pcreErrorStr);
-			exit(EXIT_FAILURE);
-		} else {
-			if (verbose_flag)
-				fprintf(stderr, "Successfully compiled regex from string '%s'\n", aStrRegex);
-		}
-
-		// Optimize the regex
-		pcreExtra = pcre_study(reCompiled, 0, &pcreErrorStr);
-
-		/* pcre_study() returns NULL for both errors and when it can not optimize the regex.
-		   The last argument is how one checks for errors (it is NULL if everything works,
-		   and points to an error string otherwise. */
-		if(pcreErrorStr != NULL) {
-			printf("ERROR: Could not study regex string '%s': %s\n", aStrRegex, pcreErrorStr);
-			exit(EXIT_FAILURE);
-		}
-	}
-
 	if (names || names_from_stdin) {
 		if (names) {
 			names_fp = fopen(names,"r");
@@ -302,8 +271,8 @@ int main(int argc, char *argv[]) {
 			names_fp = stdin;
 		}
 		count = pull_by_name(in, names_fp, min, max, length, exclude, convert, just_count);
-	} else if (reCompiled) {
-		count = pull_by_re(in, reCompiled, pcreExtra, min, max, length, exclude, convert, just_count);
+	} else if (aStrRegex) {
+		count = pull_by_re(in, aStrRegex, min, max, length, exclude, convert, just_count);
 	} else {
 		count = pull_by_size(in, min, max, length, convert, just_count);
 	}
@@ -317,15 +286,8 @@ int main(int argc, char *argv[]) {
 	if (names_fp)
 		fclose(names_fp);
 
-	if (aStrRegex) {
+	if (aStrRegex)
 		free(aStrRegex);
-		// Free up the regular expression.
-		pcre_free(reCompiled);
-
-		// Free up the EXTRA PCRE value (may be NULL at this point)
-		if (pcreExtra != NULL)
-			pcre_free(pcreExtra);
-	}
 
 	if (verbose_flag)
 		fprintf(stderr,"Pulled %i entries\n",count);

@@ -1,29 +1,36 @@
+#define PCRE2_CODE_UNIT_WIDTH 8
+
 #include <stdio.h>
 #include <string.h>
-#include <pcre.h>
+#include <pcre2.h>
 
 #include "search_header.h"
 #include "global.h"
 
 
-int search_header(pcre *re, pcre_extra *re_extra, char *str) {
+/* re is a compiled pcre2 regex */
+int search_header(pcre2_code *re, char *str) {
 	int pcreExecRet;
-	int pcre_ovector[MAX_CAPTURE_COUNT];
+	pcre2_match_data *match_data;
 
 	if (str == NULL) {
 		return 0;
 	}
+	match_data = pcre2_match_data_create_from_pattern(re, NULL); // init structure for result
 
-	pcreExecRet = pcre_exec(re, re_extra,
+	/* run the match */
+	pcreExecRet = pcre2_match(re,
 			str, 
 			strlen(str),    // length of header string
 			0,                      // Start looking at this point
 			0,                      // pcre exec OPTIONS
-			pcre_ovector,           // capture groups vector
-			MAX_CAPTURE_COUNT);     // Length of output capture groups
+			match_data, // pcre2_match_data
+			NULL); // default match context
+
+	pcre2_match_data_free(match_data);   /* Release memory used for the match */
 
 	if (pcreExecRet < 0) {
-		if (pcreExecRet == PCRE_ERROR_NOMATCH)
+		if (pcreExecRet == PCRE2_ERROR_NOMATCH)
 			return 0;
 		else
 			fprintf(stderr, "Problem with your regex (%d)\n", pcreExecRet);
