@@ -89,6 +89,9 @@ REQUIREMENTS:
   emerge zlib).
 
 INSTALL:
+  ** NOTE: This version uses PCRE version 1, and not the newest PCRE2 library. The
+  **       master branch support PCRE2.
+
   To install, do the following in a shell on your system...
 
   From Git:
