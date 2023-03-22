@@ -11,6 +11,7 @@
 #include "file_read.h"
 #include "global.h"
 #include "size_filter.h"
+#include "search_header.h"
 
 
 __KS_GETC(gzread, BUFFER_SIZE)
