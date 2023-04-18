@@ -20,7 +20,7 @@ char *parse_name(char *line)
 
 #define BUFSIZE 80
 	int getl(char **lineptr, FILE *fp) {
-		char ch;
+		int ch;
 		ssize_t buf_pos = 0;
 		ssize_t count = 2; /* Always buf_pos + 2 (see below). */
 		size_t new_length = 0;
@@ -73,7 +73,7 @@ char *parse_name(char *line)
 				*lineptr = temp; /* set line to this new temp string */
 			}
 
-			(*lineptr)[buf_pos++] = ch; /* set this char in the string at buf_pos and THEN increment buf_pos */
+			(*lineptr)[buf_pos++] = (char)ch; /* set this char in the string at buf_pos and THEN increment buf_pos */
 
 			if (ch == '\n') /* eol */
 				break;
