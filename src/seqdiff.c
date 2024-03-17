@@ -9,7 +9,9 @@
 #include "cmpseq.h"
 #include "seqdiff.h"
 
-extern int verbose_flag;
+int verbose_flag;
+char const *progname;
+
 #define VERSION 0.1
 
 void show_usage(int status) {

@@ -23,8 +23,8 @@ __KS_BASIC(gzFile, BUFFER_SIZE)
 __KSEQ_TYPE(gzFile)
 __KSEQ_BASIC(static, gzFile)
 
-char const *progname;
-int QUALITY_SCORE;
-int verbose_flag;
+extern char const *progname;
+extern int QUALITY_SCORE;
+extern int verbose_flag;
 
 #endif
