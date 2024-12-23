@@ -88,7 +88,22 @@ REQUIREMENTS:
   or commonly from your OS package manager (e.g. apt-get zlib or
   emerge zlib).
 
-INSTALL:
+NEW INSTALL:
+  Pullseq uses CMake, so you must have CMake installed on your system.
+
+  git clone: https://github.com/bcthomas/pullseq.git
+  cd pullseq
+  mkdir build
+  cd build
+  cmake ..
+
+  This will build binaries in build/src/
+  > build/src/pullseq
+  > build/src/seqdiff
+
+
+
+OLD INSTALL:
   To install, do the following in a shell on your system...
 
   From Git:
