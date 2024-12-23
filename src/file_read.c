@@ -14,7 +14,7 @@ char *parse_name(char *line)
 	word = strtok(line, delims);
 	/* check if the name begins with '>' or '@' and drop it */
 	if ( *word == '>' || *word == '@' )
-		word = word++; /* move the word up one char */
+		word++; /* move the word up one char */
 	return word;
 }
 
@@ -35,7 +35,7 @@ char *parse_name(char *line)
 		if (errno != 0)
 			errno = 0;
 
-		if ((*lineptr == NULL)) {
+		if (*lineptr == NULL) {
 			*lineptr = malloc(n * sizeof(char));
 
 			if (*lineptr == NULL) {

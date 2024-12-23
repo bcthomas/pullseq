@@ -4,9 +4,11 @@
 
 #include "global.h"
 
-/*extern char const *progname;
+/*
+extern char const *progname;
 extern int verbose_flag;
 */
+
 int QUALITY_SCORE;
 
 void print_fastq_seq(kseq_t *seq)
