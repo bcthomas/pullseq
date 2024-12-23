@@ -18,8 +18,10 @@ __KS_GETC(gzread, BUFFER_SIZE)
 __KS_GETUNTIL(gzread, BUFFER_SIZE)
 __KSEQ_READ(static)
 
+/*
 extern char const *progname;
 extern int verbose_flag;
+*/
 
 int pull_by_re(char *input_file, char *aStrRegex, int min, int max, int length, int exclude, int convert, int just_count) {
 	gzFile fp;

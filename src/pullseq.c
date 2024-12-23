@@ -11,8 +11,8 @@
 #include "pull_by_size.h"
 #include "pull_by_re.h"
 
-extern int QUALITY_SCORE;
-extern int verbose_flag;
+int verbose_flag;
+char const *progname;
 
 void show_usage(int status) {
 	fprintf(stderr, "pullseq - a bioinformatics tool for manipulating fasta and fastq files\n");
@@ -208,16 +208,20 @@ int main(int argc, char *argv[]) {
 				fprintf(stderr,"Names in STDIN will be included\n");
 
 		} else if (names != NULL) {
-			if (exclude)
+			if (exclude) {
 				fprintf(stderr,"Names in %s will be excluded\n", names);
-			else
+            }
+			else {
 				fprintf(stderr,"Names in %s will be included\n", names);
+            }
 		}
 		if (aStrRegex)
-			if (exclude)
+			if (exclude) {
 				fprintf(stderr,"Only sequences not matching %s will be output\n", aStrRegex);
-			else
+            }
+			else {
 				fprintf(stderr,"Only sequences matching %s will be output\n", aStrRegex);
+            }
 		if (max > 0)
 			fprintf(stderr,"Only sequences less than %i will be output\n", max);
 		if (min > 0)
