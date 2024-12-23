@@ -42,3 +42,4 @@ test/test_locations.txt
 test/test_locations_gene.txt
 test/test_locations_noname.txt
 test/test_noname.fa
+build/
